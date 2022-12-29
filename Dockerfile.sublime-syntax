@@ -1,0 +1,198 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/syntax.html
+name: Dockerfile
+file_extensions:
+  - Dockerfile
+first_line_match: (?i)^from[ ][^:]+:[^:]+
+scope: source.dockerfile
+version: 2
+
+variables:
+  identifier: '[[:alnum:]]+'
+  onbuild_instruction: (?i:add|arg|env|copy|expose|healthcheck|label|run|shell|stopsignal|user|volume|workdir)
+  non_onbuild_instruction: (?i:maintainer)
+  shell_instruction: (?i:run|cmd|entrypoint|shell)
+
+contexts:
+  main:
+    - include: parser-directives
+    - include: comments
+    - match: (?i)^\s*(?=ARG|FROM)\b
+      push: expect-arg-or-from-instructions
+
+###[ PARSER DIRECTIVES AND COMMENTS ]##############################################################
+
+  parser-directives:
+    - match: '^\s*(#)(?=\s*\w+\s*=)'
+      captures:
+        1: comment.line.dockerfile meta.annotation.dockerfile punctuation.definition.annotation.dockerfile
+      push: parser-directive-body
+
+  parser-directive-body:
+    - meta_content_scope: comment.line.dockerfile meta.annotation.identifier.dockerfile
+    - match: \w+
+      scope: variable.language.dockerfile
+    - match: =
+      scope: keyword.operator.assignment.dockerfile
+      set: parser-directive-value
+
+  parser-directive-value:
+    - meta_scope: comment.line.dockerfile meta.annotation.parameters.dockerfile string.unquoted.dockerfile
+    - match: $\n?
+      pop: true
+
+  comments:
+    - match: ^\s*(#)
+      captures:
+        1: punctuation.definition.comment.dockerfile
+      push: comment-body
+
+  comment-body:
+    - meta_scope: comment.line.number-sign.dockerfile
+    - match: $\n?
+      pop: true
+
+####[ FROM INSTRUCTION ]###########################################################################
+
+  from-expect-name:
+    - match: '[^\s:@]+'
+      scope: support.module.dockerfile
+      set: from-optional-tag
+    - match: $\n?
+      scope: invalid.illegal.missing-identifier.dockerfile
+      pop: true
+
+  from-optional-tag:
+    - match: '[:@]'
+      scope: punctuation.separator.key-value.dockerfile
+      set: expect-container-tag
+    - match: (?=\S)|$
+      pop: true
+
+  from-optional-as:
+    - match: (?i)\b(as)\s+(\w+)
+      captures:
+        1: keyword.context.dockerfile
+        2: entity.name.label.dockerfile
+      pop: true
+    - match: $
+      pop: true
+
+  expect-container-tag:
+    - match: \S+
+      scope: support.constant.dockerfile
+      pop: true
+    - match: $\n?
+      scope: invalid.illegal.missing-tag-or-digest.dockerfile
+      pop: true
+
+####[ INSTRUCTION ARGS ]###########################################################################
+
+  optional-instruction-args:
+    - match: (--)\w+
+      scope: variable.parameter.dockerfile
+      captures:
+        1: punctuation.definition.parameter.dockerfile
+      push: expect-optional-arg-assignment
+    - match: (?=\S|$)
+      pop: true
+
+  expect-optional-arg-assignment:
+    - match: '='
+      scope: keyword.operator.assignment.dockerfile
+      set: expect-optional-arg-value
+    - match: (?=\S|$)
+      pop: true
+
+  expect-optional-arg-value:
+    - match: '[^\s,]+'
+      scope: string.unquoted.dockerfile
+      pop: true
+    - match: (?=\S|$)
+      pop: true
+
+###[ INSTRUCTIONS ]################################################################################
+
+  expect-arg-or-from-instructions:
+    - match: (?i)ARG\b
+      captures:
+        1: keyword.context.dockerfile
+      set: arg-expect-name
+    - match: (?i)FROM\b
+      scope: keyword.import.from.dockerfile
+      set:
+        - expect-instructions
+        - from-optional-as
+        - from-expect-name
+        - optional-instruction-args
+
+  expect-instructions:
+    - include: comments
+    - include: expect-arg-or-from-instructions
+    - match: (?i)^\s*(onbuild)\s+(?={{onbuild_instruction}}\s)
+      captures:
+        1: storage.modifier.dockerfile
+      push: instruction
+    - match: ^\s*(?=(?:{{onbuild_instruction}}|{{non_onbuild_instruction}})\b)
+      push: instruction
+    - match: ^\s*(?={{shell_instruction}}\b)
+      push: shell-instruction
+
+  instruction:
+    - match: (ENV)\s(\w+)([ ])
+      captures:
+        1: keyword.context.dockerfile
+        2: variable.other.readwrite.shell
+        3: invalid.deprecated.missing-equals.dockerfile
+      set:
+        - match: $
+          pop: true
+        - include: scope:source.shell.bash#variable-value
+    - match: (ENV)\b
+      captures:
+        1: keyword.context.dockerfile
+      set:
+        - scope:source.shell.bash#cmd-export-args-meta
+        - scope:source.shell.bash#cmd-export-args
+    - include: shell-instruction
+    - match: '{{onbuild_instruction}}(?=\s)'
+      captures:
+        0: keyword.other.dockerfile
+        1: keyword.other.special-method.dockerfile
+      set: scope:source.shell.bash#cmd-args # TODO: set optional-instruction-args first?
+    - match: '{{non_onbuild_instruction}}(?=\s)'
+      scope: keyword.other.dockerfile
+      set: scope:source.shell.bash#cmd-args
+
+  shell-instruction:
+    - match: '{{shell_instruction}}\b'
+      scope: keyword.other.dockerfile
+      set: shell-instruction-args
+
+####[ SHELL INSTRUCTION ]##########################################################################
+
+  shell-instruction-args:
+    - match: (?=\s*\[)
+      set:
+        - match: $
+          pop: true
+        - include: scope:source.json
+    - match: ''
+      set: scope:source.shell.bash
+      with_prototype:
+        - match: \n|^(?=\S)
+          pop: true
+
+####[ ARG INSTRUCTION ]############################################################################
+
+  arg-expect-name:
+    - meta_content_scope: variable.parameter.dockerfile
+    - match: $
+      pop: true
+    - match: =
+      scope: keyword.operator.assignment.bash
+      set:
+        - scope:source.shell.bash#cmd-export-args-meta
+        - scope:source.shell.bash#cmd-export-args
+
