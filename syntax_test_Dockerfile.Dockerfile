@@ -49,7 +49,8 @@ RUN apk update && \
 # Install Poetry & ensure it is in $PATH
 RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | POETRY_PREVIEW=1 python
 # ^ keyword.other
-#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell
+#                                                                                                              ^ - source.shell
 #   ^^^^ meta.function-call.identifier variable.function
 #        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.function-call.arguments
 #        ^^^^ meta.parameter.option variable.parameter.option
@@ -82,7 +83,8 @@ RUN python -m venv /opt/venv && \
   cd /opt/project && \
   poetry install --no-dev --no-interaction
 # ^^^^^^ source.shell meta.function-call.identifier variable.function
-#        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell meta.function-call.arguments
+#        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell meta.function-call.arguments
+#                                         ^ - source.shell
 #                ^^ meta.parameter.option variable.parameter.option punctuation.definition.parameter
 #                  ^^^^^^ meta.parameter.option variable.parameter.option
 
