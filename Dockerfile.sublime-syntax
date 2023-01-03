@@ -174,14 +174,18 @@ contexts:
 
   shell-instruction-args:
     - match: (?=\s*\[)
-      embed: scope:source.json#array
-      escape: (?=^\s*$|^\s*#)
+      set: shell-json
     - match: '[ \t]*(?=\S)'
       embed: scope:source.shell.bash
       embed_scope: source.shell.bash.embedded.dockerfile
       escape: (?=^\s*$)|(?=\n)(?<![^\\]\\)(?<![^\\][\\]{3})
     - match: \n
       pop: 1
+
+  shell-json:
+    - match: $
+      pop: true
+    - include: scope:source.json
 
 ####[ ARG INSTRUCTION ]############################################################################
 
