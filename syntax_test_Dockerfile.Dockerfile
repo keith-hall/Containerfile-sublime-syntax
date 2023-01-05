@@ -82,7 +82,7 @@ RUN python -m venv /opt/venv && \
   pip install -U pip && \
   cd /opt/project && \
   poetry install --no-dev --no-interaction
-# ^^^^^^ source.shell meta.function-call.identifier variable.function
+# ^^^^^^ source.shell.bash.embedded.dockerfile meta.function-call.identifier variable.function
 #        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell meta.function-call.arguments
 #                                         ^ - source.shell
 #                ^^ meta.parameter.option variable.parameter.option punctuation.definition.parameter
@@ -167,9 +167,23 @@ STOPSIGNAL SIGTERM
 # ^^^^^^^^ keyword.other
 #          ^^^^^^^ meta.function-call.arguments
 
+HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost/ || exit 1
+# ^^^^^^^^^ keyword.other
+#           ^^^^^^^^^^ variable.parameter
+#           ^^ punctuation.definition.parameter
+#                     ^ keyword.operator.assignment
+#                      ^^ string.unquoted
+#                         ^^^^^^^^^ variable.parameter
+#                         ^^ punctuation.definition.parameter
+#                                  ^ keyword.operator.assignment
+#                                   ^^ string.unquoted
+#                                      ^^^ keyword.other
+#                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell.bash.embedded
+
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost/ || exit 1
-# TODO: scope CMD and everything afterwards correctly above
+# ^^^ keyword.other.dockerfile
+#     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell.bash.embedded.dockerfile
 
 # syntax=docker/dockerfile:1
 FROM debian
@@ -185,5 +199,4 @@ COPY <<-"EOT" /app/script.sh
   echo hello ${FOO}
 EOT
 # TODO: scope variable interpolation in the heredoc above
-RUN FOO=abc ash /app/script.sh
-
+RUN FOO=abc bash /app/script.sh

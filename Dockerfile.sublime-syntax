@@ -53,6 +53,10 @@ contexts:
     - match: $\n?
       pop: true
 
+  line-continuation:
+    - match: \\$\n?
+      scope: punctuation.separator.continuation.line.dockerfile
+
 ####[ FROM INSTRUCTION ]###########################################################################
 
   from-expect-name:
@@ -156,10 +160,14 @@ contexts:
         - scope:source.shell.bash#cmd-export-args-meta
         - scope:source.shell.bash#cmd-export-args
     - include: shell-instruction
+    - match: (?i)HEALTHCHECK\b
+      scope: keyword.other.dockerfile
+      set:
+        - scope:source.shell.bash#cmd-args
+        - optional-cmd
+        - optional-instruction-args
     - match: '{{onbuild_instruction}}(?=\s)'
-      captures:
-        0: keyword.other.dockerfile
-        1: keyword.other.special-method.dockerfile
+      scope: keyword.other.dockerfile
       set: scope:source.shell.bash#cmd-args # TODO: set optional-instruction-args first?
     - match: '{{non_onbuild_instruction}}(?=\s)'
       scope: keyword.other.dockerfile
@@ -173,6 +181,7 @@ contexts:
 ####[ SHELL INSTRUCTION ]##########################################################################
 
   shell-instruction-args:
+    - include: line-continuation
     - match: (?=\s*\[)
       set: shell-json
     - match: '[ \t]*(?=\S)'
@@ -187,6 +196,14 @@ contexts:
       pop: true
     - include: scope:source.json
 
+  optional-cmd:
+    - include: line-continuation
+    - match: (?i)CMD\b
+      scope: keyword.other.dockerfile
+      set: shell-instruction-args
+    - match: ''
+      pop: true
+
 ####[ ARG INSTRUCTION ]############################################################################
 
   arg-expect-name:
@@ -198,4 +215,3 @@ contexts:
       set:
         - scope:source.shell.bash#cmd-export-args-meta
         - scope:source.shell.bash#cmd-export-args
-
