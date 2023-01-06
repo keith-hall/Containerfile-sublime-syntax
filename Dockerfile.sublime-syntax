@@ -120,9 +120,8 @@ contexts:
 
   expect-arg-or-from-instructions:
     - match: (?i)ARG\b
-      captures:
-        1: keyword.context.dockerfile
-      set: arg-expect-name
+      scope: keyword.context.dockerfile
+      push: arg-expect-name
     - match: (?i)FROM\b
       scope: keyword.import.from.dockerfile
       set:

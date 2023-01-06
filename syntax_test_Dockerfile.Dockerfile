@@ -37,6 +37,15 @@ FROM --platform=linux/amd64 python:3-alpine as python_builder2
 #                                              ^^^^^^^^^^^^^^^ entity.name.label
 #                                                             ^ - entity
 
+ARG POETRY_HTTP_BASIC_AZURE_PASSWORD
+# ^ keyword.context.dockerfile
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.parameter.dockerfile
+ENV POETRY_HTTP_BASIC_AZURE_USER="docker"
+# ^ keyword.context.dockerfile
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.other.readwrite.shell
+#                               ^ keyword.operator.assignment.shell
+#                                ^^^^^^^^ string.quoted.double.shell
+
 RUN apk update && \
   apk add \
   build-base \
