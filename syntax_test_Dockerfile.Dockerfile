@@ -209,3 +209,33 @@ COPY <<-"EOT" /app/script.sh
 EOT
 # TODO: scope variable interpolation in the heredoc above
 RUN FOO=abc bash /app/script.sh
+
+# syntax=docker/dockerfile:1
+FROM ubuntu
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked apt update && apt-get --no-install-recommends install -y gcc
+# ^^ variable.parameter.dockerfile punctuation.definition.parameter.dockerfile
+#   ^^^^^ variable.parameter.dockerfile
+#        ^ keyword.operator.assignment.dockerfile
+#         ^^^^ variable.parameter.inner.dockerfile
+#             ^ keyword.operator.assignment.dockerfile
+#              ^^^^^ string.unquoted.dockerfile
+#                   ^ punctuation.separator.sequence.dockerfile
+#                    ^^^^^^ variable.parameter.inner.dockerfile
+#                          ^ keyword.operator.assignment.dockerfile
+#                           ^^^^^^^^^^^^ string.unquoted.dockerfile
+#                                       ^ punctuation.separator.sequence.dockerfile
+#                                        ^^^^^^^ variable.parameter.inner.dockerfile
+#                                               ^ keyword.operator.assignment.dockerfile
+#                                                ^^^^^^ string.unquoted.dockerfile
+#                                                       ^^^ source.shell.bash.embedded.dockerfile meta.function-call.identifier.shell variable.function.shell
+
+RUN \
+
+# <- invalid.illegal.missing-shell-instruction.dockerfile
+
+LABEL org.opencontainers.image.authors="SvenDowideit@home.org.au"
+# ^^^ keyword.other.dockerfile
+#     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.parameter.dockerfile
+#                                     ^ keyword.operator.assignment.bash

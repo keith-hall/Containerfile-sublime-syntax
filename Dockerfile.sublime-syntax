@@ -55,7 +55,12 @@ contexts:
 
   line-continuation:
     - match: \\$\n?
-      scope: punctuation.separator.continuation.line.dockerfile
+      push: inside-line-continuation
+
+  inside-line-continuation:
+    - meta_scope: punctuation.separator.continuation.line.dockerfile
+    - match: ^
+      pop: true
 
 ####[ FROM INSTRUCTION ]###########################################################################
 
@@ -99,6 +104,7 @@ contexts:
       captures:
         1: punctuation.definition.parameter.dockerfile
       push: expect-optional-arg-assignment
+    - include: line-continuation
     - match: (?=\S|$)
       pop: true
 
@@ -110,11 +116,25 @@ contexts:
       pop: true
 
   expect-optional-arg-value:
+    - match: (?=\w+=)
+      set: expect-instruction-arg-additional-key
     - match: '[^\s,]+'
       scope: string.unquoted.dockerfile
+      set: possible-instruction-arg-value-additional-arguments
+    - match: (?=\s|$)
       pop: true
-    - match: (?=\S|$)
+
+  possible-instruction-arg-value-additional-arguments:
+    - match: ','
+      scope: punctuation.separator.sequence.dockerfile
+      set: expect-instruction-arg-additional-key
+    - match: ''
       pop: true
+
+  expect-instruction-arg-additional-key:
+    - match: \w+(?==)
+      scope: variable.parameter.inner.dockerfile
+      set: expect-optional-arg-assignment
 
 ###[ INSTRUCTIONS ]################################################################################
 
@@ -143,7 +163,7 @@ contexts:
       push: shell-instruction
 
   instruction:
-    - match: (ENV)\s(\w+)([ ])
+    - match: (?i)(ENV)\s(\w+)([ ])
       captures:
         1: keyword.context.dockerfile
         2: variable.other.readwrite.shell
@@ -152,12 +172,17 @@ contexts:
         - match: $
           pop: true
         - include: scope:source.shell.bash#variable-value
-    - match: (ENV)\b
+    - match: (?i)(ENV)\b
       captures:
         1: keyword.context.dockerfile
       set:
         - scope:source.shell.bash#cmd-export-args-meta
         - scope:source.shell.bash#cmd-export-args
+    - match: (?i)(LABEL)\b
+      captures:
+        1: keyword.other.dockerfile
+      set:
+        - arg-expect-name
     - include: shell-instruction
     - match: (?i)HEALTHCHECK\b
       scope: keyword.other.dockerfile
@@ -175,19 +200,22 @@ contexts:
   shell-instruction:
     - match: '{{shell_instruction}}\b'
       scope: keyword.other.dockerfile
-      set: shell-instruction-args
+      set:
+        - shell-instruction-args
+        - optional-instruction-args
 
 ####[ SHELL INSTRUCTION ]##########################################################################
 
   shell-instruction-args:
-    - include: line-continuation
     - match: (?=\s*\[)
       set: shell-json
-    - match: '[ \t]*(?=\S)'
+    - match: '[ \t]*(?!\\$)(?=\S)'
       embed: scope:source.shell.bash
       embed_scope: source.shell.bash.embedded.dockerfile
       escape: (?=^\s*$)|(?=\n)(?<![^\\]\\)(?<![^\\][\\]{3})
-    - match: \n
+      pop: 1
+    - match: $\n?
+      scope: invalid.illegal.missing-shell-instruction.dockerfile
       pop: 1
 
   shell-json:
