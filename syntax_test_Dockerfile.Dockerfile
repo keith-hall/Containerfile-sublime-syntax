@@ -199,8 +199,10 @@ FROM debian
 RUN <<EOT bash
   apt-get update
   apt-get install -y something
+  # TODO: scope as bash script
 EOT
-# TODO: scope heredoc correctly above
+# <- source.shell.bash.embedded.dockerfile meta.string.heredoc.shell meta.tag.heredoc.shell entity.name.tag.heredoc.shell
+#  ^ - meta.string
 
 # syntax=docker/dockerfile:1
 FROM alpine

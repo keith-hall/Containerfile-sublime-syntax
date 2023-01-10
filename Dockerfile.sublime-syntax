@@ -210,10 +210,7 @@ contexts:
     - match: (?=\s*\[)
       set: shell-json
     - match: '[ \t]*(?!\\$)(?=\S)'
-      embed: scope:source.shell.bash
-      embed_scope: source.shell.bash.embedded.dockerfile
-      escape: (?=^\s*$)|(?=\n)(?<![^\\]\\)(?<![^\\][\\]{3})
-      pop: 1
+      set: embedded_shell
     - match: $\n?
       scope: invalid.illegal.missing-shell-instruction.dockerfile
       pop: 1
@@ -222,6 +219,13 @@ contexts:
     - match: $
       pop: true
     - include: scope:source.json
+
+  embedded_shell:
+    - meta_scope: source.shell.bash.embedded.dockerfile
+    - include: line-continuation
+    - match: $
+      pop: true
+    - include: scope:source.shell.bash#statements
 
   optional-cmd:
     - include: line-continuation
