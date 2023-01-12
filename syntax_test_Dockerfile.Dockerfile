@@ -1,4 +1,4 @@
-# SYNTAX TEST "Dockerfile.sublime-syntax"
+# SYNTAX TEST partial-symbols "Dockerfile.sublime-syntax"
 # syntax=docker/dockerfile:1
 
 #directive=value
@@ -20,6 +20,7 @@ FROM python:3-alpine as python_builder
 #           ^^^^^^^^ support.constant
 #                    ^^ keyword.context
 #                       ^^^^^^^^^^^^^^ entity.name.label
+#                       @@@@@@@@@@@@@@ definition
 
 # notadirective=because appears after a builder instruction
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign - meta.annotation
@@ -36,6 +37,9 @@ FROM --platform=linux/amd64 python:3-alpine as python_builder2
 #                                           ^^ keyword.context
 #                                              ^^^^^^^^^^^^^^^ entity.name.label
 #                                                             ^ - entity
+
+FROM python_builder AS test
+#    @@@@@@@@@@@@@@ reference
 
 ARG POETRY_HTTP_BASIC_AZURE_PASSWORD
 # ^ keyword.context.dockerfile
