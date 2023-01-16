@@ -35,5 +35,5 @@ jobs:
         with:
           build: ${{ matrix.build }}
           default_packages: ${{ matrix.packages }}
-          package_root: test/third-party
+          package_root: third-party
           additional_packages: third-party/PowerShell
