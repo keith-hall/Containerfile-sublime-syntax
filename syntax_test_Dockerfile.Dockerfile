@@ -10,7 +10,8 @@
 # <- comment.line meta.annotation punctuation.definition.annotation
 #   ^^^^^^^^^ meta.annotation.identifier variable.language
 #            ^ meta.annotation keyword.operator.assignment
-#             ^^^^^^ meta.annotation.parameters string.unquoted
+#             ^^^^^^ meta.annotation.parameters
+#             ^^^^^ string.unquoted
 
 FROM python:3-alpine as python_builder
 # <- keyword.import.from

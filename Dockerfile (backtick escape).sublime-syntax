@@ -1,0 +1,19 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/syntax.html
+name: Dockerfile (backtick escape)
+scope: source.dockerfile.backtick
+version: 2
+extends: Packages/Dockerfile-sublime-syntax/Dockerfile.sublime-syntax
+hidden: true
+
+variables:
+  escape_character: '`'
+
+contexts:
+  embedded_shell:
+    - meta_scope: source.shell.powershell.embedded.dockerfile
+    - include: line-continuation
+    - match: $
+      pop: true
+    - include: scope:source.powershell

@@ -13,6 +13,7 @@ variables:
   onbuild_instruction: (?i:add|arg|env|copy|expose|healthcheck|label|run|shell|stopsignal|user|volume|workdir)
   non_onbuild_instruction: (?i:maintainer)
   shell_instruction: (?i:run|cmd|entrypoint|shell)
+  escape_character: \\
 
 contexts:
   main:
@@ -24,6 +25,12 @@ contexts:
 ###[ PARSER DIRECTIVES AND COMMENTS ]##############################################################
 
   parser-directives:
+    - match: (?i)^\s*(#)(?=\s*escape\s*=\s*`$)
+      captures:
+        1: comment.line.dockerfile meta.annotation.dockerfile punctuation.definition.annotation.dockerfile
+      set:
+        - scope:source.dockerfile.backtick
+        - parser-directive-body
     - match: '^\s*(#)(?=\s*\w+\s*=)'
       captures:
         1: comment.line.dockerfile meta.annotation.dockerfile punctuation.definition.annotation.dockerfile
@@ -38,7 +45,8 @@ contexts:
       set: parser-directive-value
 
   parser-directive-value:
-    - meta_scope: comment.line.dockerfile meta.annotation.parameters.dockerfile string.unquoted.dockerfile
+    - meta_scope: comment.line.dockerfile meta.annotation.parameters.dockerfile
+    - meta_content_scope: string.unquoted.dockerfile
     - match: $\n?
       pop: true
 
@@ -54,7 +62,7 @@ contexts:
       pop: true
 
   line-continuation:
-    - match: \\$\n?
+    - match: '{{escape_character}}$\n?'
       push: inside-line-continuation
 
   inside-line-continuation:
@@ -209,7 +217,7 @@ contexts:
   shell-instruction-args:
     - match: (?=\s*\[)
       set: shell-json
-    - match: '[ \t]*(?!\\$)(?=\S)'
+    - match: '[ \t]*(?!{{escape_character}}$)(?=\S)'
       set: embedded_shell
     - match: $\n?
       scope: invalid.illegal.missing-shell-instruction.dockerfile
