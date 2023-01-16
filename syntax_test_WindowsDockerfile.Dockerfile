@@ -13,3 +13,13 @@
 FROM microsoft/nanoserver
 COPY testfile.txt c:\
 RUN dir c:\
+
+RUN Get-CimInstance -ComputerName localhost win32_logicaldisk `
+<# | where caption -eq "C:" ` #> `
+| where caption -eq "D:" `
+| foreach-object {write " $($_.caption) $('{0:N2}' `
+  -f ($_.Size/1gb)) GB total, $('{0:N2}' `
+  -f ($_.FreeSpace/1gb)) GB free "}
+# ^^ source.dockerfile source.powershell.embedded meta.block string.quoted.double interpolated.complex.source keyword.operator.string-format
+
+# <- - source.powershell

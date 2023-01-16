@@ -12,7 +12,7 @@ variables:
 
 contexts:
   embedded_shell:
-    - meta_scope: source.shell.powershell.embedded.dockerfile
+    - meta_scope: source.powershell.embedded.dockerfile
     - include: line-continuation
     - match: $
       pop: true
