@@ -14,6 +14,9 @@
 #             ^^^^^ string.unquoted
 
 FROM python:3-alpine as python_builder
+# <- meta.namespace
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace
+#                                     ^ - meta.namespace
 # <- keyword.import.from
 # ^^ keyword.import.from
 #    ^^^^^^ support.module
@@ -111,6 +114,9 @@ RUN source /opt/venv/bin/activate && \
 # Below this line is now creating the deployed container
 # Anything installed above but not explicitly copied below is *not* available in the final container!
 FROM python:3-alpine
+# <- meta.namespace
+#^^^^^^^^^^^^^^^^^^^ meta.namespace
+#                   ^ - meta.namespace
 
 # Any general deployed container setup that you want cached should go here
 

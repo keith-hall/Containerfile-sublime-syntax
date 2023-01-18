@@ -104,6 +104,11 @@ contexts:
       scope: invalid.illegal.missing-tag-or-digest.dockerfile
       pop: true
 
+  from-line-meta-scope:
+    - meta_scope: meta.namespace.dockerfile
+    - match: ''
+      pop: true
+
 ####[ INSTRUCTION ARGS ]###########################################################################
 
   optional-instruction-args:
@@ -154,6 +159,7 @@ contexts:
       scope: keyword.import.from.dockerfile
       set:
         - expect-instructions
+        - from-line-meta-scope
         - from-optional-as
         - from-expect-name
         - optional-instruction-args
