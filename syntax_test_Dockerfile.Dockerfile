@@ -29,7 +29,7 @@ FROM python:3-alpine as python_builder
 # notadirective=because appears after a builder instruction
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign - meta.annotation
 
-FROM --platform=linux/amd64 python:3-alpine as python_builder2
+FROM --platform=linux/amd64 python:3-alpine as python-builder2
 # ^^ keyword.import.from
 #    ^^^^^^^^^^ variable.parameter
 #    ^^ punctuation.definition.parameter

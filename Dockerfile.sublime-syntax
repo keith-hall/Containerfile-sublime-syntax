@@ -88,7 +88,7 @@ contexts:
       pop: true
 
   from-optional-as:
-    - match: (?i)\b(as)\s+(\w+)
+    - match: (?i)\b(as)\s+([-\w]+)
       captures:
         1: keyword.context.dockerfile
         2: entity.name.label.dockerfile
