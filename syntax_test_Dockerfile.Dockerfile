@@ -15,8 +15,7 @@
 
 FROM python:3-alpine as python_builder
 # <- meta.namespace
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace
-#                                     ^ - meta.namespace
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace
 # <- keyword.import.from
 # ^^ keyword.import.from
 #    ^^^^^^ support.module
@@ -27,7 +26,7 @@ FROM python:3-alpine as python_builder
 #                       @@@@@@@@@@@@@@ definition
 
 # notadirective=because appears after a builder instruction
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign - meta.annotation
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign - meta.annotation - meta.namespace
 
 FROM --platform=linux/amd64 python:3-alpine as python-builder2
 # ^^ keyword.import.from
@@ -115,8 +114,8 @@ RUN source /opt/venv/bin/activate && \
 # Anything installed above but not explicitly copied below is *not* available in the final container!
 FROM python:3-alpine
 # <- meta.namespace
-#^^^^^^^^^^^^^^^^^^^ meta.namespace
-#                   ^ - meta.namespace
+#^^^^^^^^^^^^^^^^^^^^ meta.namespace
+#                    ^ - meta.namespace
 
 # Any general deployed container setup that you want cached should go here
 

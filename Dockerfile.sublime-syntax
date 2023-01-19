@@ -106,7 +106,7 @@ contexts:
 
   from-line-meta-scope:
     - meta_scope: meta.namespace.dockerfile
-    - match: ''
+    - match: $\n?
       pop: true
 
 ####[ INSTRUCTION ARGS ]###########################################################################
