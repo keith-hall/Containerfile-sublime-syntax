@@ -145,7 +145,7 @@ contexts:
       pop: true
 
   expect-instruction-arg-additional-key:
-    - match: \w+(?==)
+    - match: \w+\b
       scope: variable.parameter.inner.dockerfile
       set: expect-optional-arg-assignment
 

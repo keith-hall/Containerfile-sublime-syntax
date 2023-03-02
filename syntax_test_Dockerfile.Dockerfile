@@ -243,6 +243,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 #                                                ^^^^^^ string.unquoted.dockerfile
 #                                                       ^^^ source.shell.bash.embedded.dockerfile meta.function-call.identifier.shell variable.function.shell
 
+RUN --mount=type=bind,source=./for_mounting,target=/app,readonly do_something
+#                                                      ^ punctuation.separator.sequence.dockerfile
+#                                                       ^^^^^^^^ variable.parameter.inner.dockerfile
+#                                                                ^^^^^^^^^^^^ variable.function.shell
+
 RUN \
 
 # <- invalid.illegal.missing-shell-instruction.dockerfile
