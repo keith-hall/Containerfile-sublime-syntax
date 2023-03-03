@@ -107,7 +107,7 @@ contexts:
   from-optional-tag:
     - match: '[:@]'
       scope: punctuation.separator.key-value.dockerfile
-      set: expect-container-tag
+      set: [container-tag, expect-container-tag]
     - match: (?=\S)|$
       pop: true
 
@@ -121,11 +121,21 @@ contexts:
       pop: true
 
   expect-container-tag:
-    - match: \S+
-      scope: support.constant.dockerfile
-      pop: true
     - match: $\n?
       scope: invalid.illegal.missing-tag-or-digest.dockerfile
+      pop: 2
+    - match: ''
+      pop: true
+
+  container-tag:
+    # so the meta_scope doesn't apply to the context when it isn't top most on the stack
+    - match: ''
+      set: container-tag-inside
+
+  container-tag-inside:
+    - meta_content_scope: support.constant.dockerfile
+    - include: variable-reference
+    - match: (?=\s)|$
       pop: true
 
   from-line-meta-scope:

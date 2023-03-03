@@ -280,11 +280,29 @@ RUN echo "this is the stage that sets VAR=FALSE"
 ENV VAR=FALSE
 
 FROM branch-version-${my_arg} AS final
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid
 #    ^^^^^^^^^^^^^^^^^^^^^^^^ support.module.dockerfile
 #                   ^^^^^^^^^ meta.interpolation.parameter.dockerfile
 #                   ^ punctuation.definition.variable
 #                    ^ punctuation.section.interpolation.begin.dockerfile - variable
 #                     ^^^^^^ variable.parameter
 #                           ^ punctuation.section.interpolation.end.dockerfile - variable
+#                            ^ - support
+#                             ^^ keyword.context
+#                                ^^^^^ entity.name.label
 RUN echo "VAR is equal to ${VAR}"
+
+#----------------------------------------------------------
+FROM some_image:v${my_arg} AS another
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid
+#    ^^^^^^^^^^ support.module
+#              ^ punctuation.separator.key-value
+#               ^^^^^^^^^^ support.constant
+#                ^ punctuation.definition.variable
+#                 ^ punctuation.section.interpolation.begin.dockerfile - variable
+#                  ^^^^^^ variable.parameter
+#                        ^ punctuation.section.interpolation.end.dockerfile - variable
+#                         ^ - support
+#                          ^^ keyword.context
+#                            ^ - keyword - entity
+#                             ^^^^^ entity.name.label
