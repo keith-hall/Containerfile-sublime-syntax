@@ -15,11 +15,11 @@
 
 FROM python:3-alpine as python_builder
 # <- meta.namespace
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid
 # <- keyword.import.from
 # ^^ keyword.import.from
 #    ^^^^^^ support.module
-#          ^ punctuation.separator.key-value
+#          ^ punctuation.separator.key-value - support
 #           ^^^^^^^^ support.constant
 #                    ^^ keyword.context
 #                       ^^^^^^^^^^^^^^ entity.name.label
@@ -29,11 +29,12 @@ FROM python:3-alpine as python_builder
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign - meta.annotation - meta.namespace
 
 FROM --platform=linux/amd64 python:3-alpine as python-builder2
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid
 # ^^ keyword.import.from
-#    ^^^^^^^^^^ variable.parameter
+#    ^^^^^^^^^^ variable.parameter - support
 #    ^^ punctuation.definition.parameter
 #              ^ keyword.operator.assignment
-#               ^^^^^^^^^^^ string.unquoted
+#               ^^^^^^^^^^^ string.unquoted - support
 #                           ^^^^^^ support.module
 #                                 ^ punctuation.separator.key-value
 #                                  ^^^^^^^^ support.constant
@@ -43,6 +44,10 @@ FROM --platform=linux/amd64 python:3-alpine as python-builder2
 
 FROM python_builder AS test
 #    @@@@@@@@@@@@@@ reference
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^ - invalid
+#                   ^^ keyword.context
+#                      ^^^^ entity.name.label
+#                      @@@@ definition
 
 ARG POETRY_HTTP_BASIC_AZURE_PASSWORD
 # ^ keyword.context.dockerfile
@@ -116,6 +121,7 @@ FROM python:3-alpine
 # <- meta.namespace
 #^^^^^^^^^^^^^^^^^^^^ meta.namespace
 #                    ^ - meta.namespace
+#^^^^^^^^^^^^^^^^^^^^ - invalid
 
 # Any general deployed container setup that you want cached should go here
 
@@ -142,6 +148,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 # -------------------------------
 
 FROM microsoft/windowsservercore
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid
+#    ^^^^^^^^^^^^^^^^^^^^^^^^^^^ support.module
 
 # Executed as cmd /S /C echo default
 RUN echo default
@@ -256,3 +264,27 @@ LABEL org.opencontainers.image.authors="SvenDowideit@home.org.au"
 # ^^^ keyword.other.dockerfile
 #     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.parameter.dockerfile
 #                                     ^ keyword.operator.assignment.bash
+
+#https://stackoverflow.com/a/60820156/4473405
+ARG my_arg
+
+FROM centos:7 AS base
+RUN echo "do stuff with the centos image"
+
+FROM base AS branch-version-1
+RUN echo "this is the stage that sets VAR=TRUE"
+ENV VAR=TRUE
+
+FROM base AS branch-version-2
+RUN echo "this is the stage that sets VAR=FALSE"
+ENV VAR=FALSE
+
+FROM branch-version-${my_arg} AS final
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace
+#    ^^^^^^^^^^^^^^^^^^^^^^^^ support.module.dockerfile
+#                   ^^^^^^^^^ meta.interpolation.parameter.dockerfile
+#                   ^ punctuation.definition.variable
+#                    ^ punctuation.section.interpolation.begin.dockerfile - variable
+#                     ^^^^^^ variable.parameter
+#                           ^ punctuation.section.interpolation.end.dockerfile - variable
+RUN echo "VAR is equal to ${VAR}"

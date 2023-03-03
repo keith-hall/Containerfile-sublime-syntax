@@ -73,12 +73,36 @@ contexts:
 ####[ FROM INSTRUCTION ]###########################################################################
 
   from-expect-name:
-    - match: '[^\s:@]+'
-      scope: support.module.dockerfile
-      set: from-optional-tag
     - match: $\n?
       scope: invalid.illegal.missing-identifier.dockerfile
+      pop: 2
+    - match: \s*(?=:@)
+      scope: invalid.illegal.missing-identifier.dockerfile
+      set: from-optional-tag
+    - match: ''
       pop: true
+
+  from-name-inside:
+    - meta_content_scope: support.module.dockerfile
+    - include: variable-reference
+    - match: (?=[\s:@])
+      set: from-optional-tag
+    - match: $\n?
+      pop: true
+
+  from-name:
+    # so the meta_scope doesn't apply to the context when it isn't top most on the stack
+    - match: ''
+      set: from-name-inside
+
+  variable-reference:
+    - match: (\$)(\{)(\w+)(\})
+      captures:
+        0: meta.interpolation.parameter.dockerfile
+        1: punctuation.definition.variable.dockerfile
+        2: punctuation.section.interpolation.begin.dockerfile
+        3: variable.parameter.dockerfile
+        4: punctuation.section.interpolation.end.dockerfile
 
   from-optional-tag:
     - match: '[:@]'
@@ -161,6 +185,7 @@ contexts:
         - expect-instructions
         - from-line-meta-scope
         - from-optional-as
+        - from-name
         - from-expect-name
         - optional-instruction-args
 
