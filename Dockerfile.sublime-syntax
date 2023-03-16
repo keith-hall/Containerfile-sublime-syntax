@@ -146,7 +146,7 @@ contexts:
 ####[ INSTRUCTION ARGS ]###########################################################################
 
   optional-instruction-args:
-    - match: (--)\w+
+    - match: (--)\w+(?:-[-\w]*)?
       scope: variable.parameter.dockerfile
       captures:
         1: punctuation.definition.parameter.dockerfile

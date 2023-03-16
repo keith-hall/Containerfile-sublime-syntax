@@ -306,3 +306,11 @@ FROM some_image:v${my_arg} AS another
 #                          ^^ keyword.context
 #                            ^ - keyword - entity
 #                             ^^^^^ entity.name.label
+
+
+HEALTHCHECK --start-period=10s --interval=5s --retries=10 --timeout=3s CMD /opt/mssql-tools/bin/sqlcmd -d some_database -U sa -P some_sa_pa55word -Q 'SELECT 1;'
+# ^^^^^^^^^ keyword.other.dockerfile
+#           ^^ punctuation.definition.parameter.dockerfile
+#             ^^^^^^^^^^^^ variable.parameter.dockerfile
+#                         ^ keyword.operator.assignment.dockerfile
+#                          ^^^ string.unquoted.dockerfile
