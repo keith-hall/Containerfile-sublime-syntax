@@ -233,6 +233,8 @@ contexts:
       set:
         - arg-expect-name
     - include: shell-instruction
+    - match: (?i)HEALTHCHECK\s+NONE\b
+      scope: keyword.other.dockerfile
     - match: (?i)HEALTHCHECK\b
       scope: keyword.other.dockerfile
       set:
@@ -256,18 +258,55 @@ contexts:
 ####[ SHELL INSTRUCTION ]##########################################################################
 
   shell-instruction-args:
-    - match: (?=\s*\[)
-      set: shell-json
+    - match: \s*(\[)
+      captures:
+        1: punctuation.section.sequence.begin.dockerfile
+      set: inside-shell-json-array-of-strings
     - match: '[ \t]*(?!{{escape_character}}$)(?=\S)'
       set: embedded_shell
     - match: $\n?
       scope: invalid.illegal.missing-shell-instruction.dockerfile
       pop: 1
 
-  shell-json:
-    - match: $
+  inside-shell-json-array-of-strings:
+    - meta_scope: meta.sequence.dockerfile
+    - match: \]
+      scope: invalid.illegal.expected-string.json
+    - match: \"
+      scope: punctuation.definition.string.begin.json
+      push:
+        - shell-json-expect-comma-or-end-of-array
+        - inside-json-string
+    - include: shell-json-common
+
+  shell-json-common:
+    - include: line-continuation
+    - include: comments
+    - match: $\n
+      scope: invalid.illegal.line-end.dockerfile
       pop: true
-    - include: scope:source.json
+
+  inside-json-string:
+    - meta_scope: string.quoted.double.json
+    - match: \"
+      scope: punctuation.definition.string.end.json
+      pop: 1
+    - include: scope:source.json#string-escape
+    - match: $\n
+      scope: invalid.illegal.unclosed-string.json
+      pop: 1
+
+  shell-json-expect-comma-or-end-of-array:
+    - include: shell-json-common
+    - match: \]
+      scope: punctuation.section.sequence.end.json
+      pop: 2
+    - match: ','
+      scope: punctuation.separator.sequence.json
+      pop: true
+    - match: '[^\s\]]'
+      scope: invalid.illegal.expected-sequence-separator.json
+      pop: true
 
   embedded_shell:
     - meta_scope: source.shell.bash.embedded.dockerfile

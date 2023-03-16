@@ -314,3 +314,55 @@ HEALTHCHECK --start-period=10s --interval=5s --retries=10 --timeout=3s CMD /opt/
 #             ^^^^^^^^^^^^ variable.parameter.dockerfile
 #                         ^ keyword.operator.assignment.dockerfile
 #                          ^^^ string.unquoted.dockerfile
+
+ENTRYPOINT [\
+    "sh",\
+    # comment halfway through with no line continuation required
+    # <- punctuation.definition.comment.dockerfile
+    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign.dockerfile
+    "-c","echo hello $NAME"]
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.sequence.dockerfile - invalid
+#   ^^^^ string.quoted.double.json
+#       ^ punctuation.separator.sequence
+#        ^^^^^^^^^^^^^^^^^^ string.quoted.double.json
+#                          ^ punctuation.section.sequence.end
+#                           ^ - illegal - meta.sequence
+
+HEALTHCHECK NONE
+# ^^^^^^^^^^^^^^ keyword.other.dockerfile
+
+ENTRYPOINT [\
+    "sh", "-c",\
+    "echo \"testing\\\u002b\""\
+    #     ^^ constant.character.escape.json
+    #              ^^^^^^^^^^ constant.character.escape.json
+    #                        ^ meta.sequence.dockerfile string.quoted.double.json punctuation.definition.string.end.json
+    #                         ^^ meta.sequence.dockerfile punctuation.separator.continuation.line.dockerfile
+]
+# <- meta.sequence.dockerfile punctuation.section.sequence.end.json
+
+ENTRYPOINT ["sh", "-c","echo testing",]
+# ^^^^^^^^ keyword.other.dockerfile
+#          ^^^^^^^^^^^^^^^^^^^^^^^^^^^ - invalid
+#          ^ punctuation.section.sequence.begin.dockerfile
+#           ^ punctuation.definition.string.begin.json
+#           ^^^^ string.quoted.double.json
+#              ^ punctuation.definition.string.end.json
+#               ^ punctuation.separator.sequence.json
+#                                     ^ meta.sequence.dockerfile invalid.illegal.expected-string.json
+
+ENTRYPOINT ["something"]
+# ^^^^^^^^ keyword.other.dockerfile
+#          ^^^^^^^^^^^^^ meta.sequence.dockerfile - invalid
+#                       ^ - meta.sequence
+#           ^^^^^^^^^^^ string.quoted.double.json
+
+ENTRYPOINT []
+# ^^^^^^^^ keyword.other.dockerfile
+#          ^ meta.sequence.dockerfile punctuation.section.sequence.begin.dockerfile
+#           ^ meta.sequence.dockerfile invalid.illegal.expected-string.json
+
+ENTRYPOINT [
+# ^^^^^^^^ keyword.other.dockerfile
+#          ^ meta.sequence.dockerfile punctuation.section.sequence.begin.dockerfile
+#           ^ meta.sequence.dockerfile invalid.illegal.line-end.dockerfile
