@@ -233,6 +233,8 @@ contexts:
       set:
         - arg-expect-name
     - include: shell-instruction
+    - match: (?i)HEALTHCHECK\s+NONE\b
+      scope: keyword.other.dockerfile
     - match: (?i)HEALTHCHECK\b
       scope: keyword.other.dockerfile
       set:

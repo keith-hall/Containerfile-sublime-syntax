@@ -314,3 +314,6 @@ HEALTHCHECK --start-period=10s --interval=5s --retries=10 --timeout=3s CMD /opt/
 #             ^^^^^^^^^^^^ variable.parameter.dockerfile
 #                         ^ keyword.operator.assignment.dockerfile
 #                          ^^^ string.unquoted.dockerfile
+
+HEALTHCHECK NONE
+# ^^^^^^^^^^^^^^ keyword.other.dockerfile
