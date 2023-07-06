@@ -4,6 +4,7 @@
 name: Dockerfile
 file_extensions:
   - Dockerfile
+  - Containerfile
 first_line_match: (?i)^from[ ][^:]+:[^:]+
 scope: source.dockerfile
 version: 2
