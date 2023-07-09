@@ -1,12 +1,12 @@
 %YAML 1.2
 ---
 # http://www.sublimetext.com/docs/syntax.html
-name: Dockerfile
+name: Containerfile
 file_extensions:
   - Dockerfile
   - Containerfile
 first_line_match: (?i)^from[ ][^:]+:[^:]+
-scope: source.dockerfile
+scope: source.containerfile
 version: 2
 
 variables:
@@ -28,37 +28,37 @@ contexts:
   parser-directives:
     - match: (?i)^\s*(#)(?=\s*escape\s*=\s*`$)
       captures:
-        1: comment.line.dockerfile meta.annotation.dockerfile punctuation.definition.annotation.dockerfile
+        1: comment.line.containerfile meta.annotation.containerfile punctuation.definition.annotation.containerfile
       set:
-        - scope:source.dockerfile.backtick
+        - scope:source.containerfile.backtick
         - parser-directive-body
     - match: '^\s*(#)(?=\s*\w+\s*=)'
       captures:
-        1: comment.line.dockerfile meta.annotation.dockerfile punctuation.definition.annotation.dockerfile
+        1: comment.line.containerfile meta.annotation.containerfile punctuation.definition.annotation.containerfile
       push: parser-directive-body
 
   parser-directive-body:
-    - meta_content_scope: comment.line.dockerfile meta.annotation.identifier.dockerfile
+    - meta_content_scope: comment.line.containerfile meta.annotation.identifier.containerfile
     - match: \w+
-      scope: variable.language.dockerfile
+      scope: variable.language.containerfile
     - match: =
-      scope: keyword.operator.assignment.dockerfile
+      scope: keyword.operator.assignment.containerfile
       set: parser-directive-value
 
   parser-directive-value:
-    - meta_scope: comment.line.dockerfile meta.annotation.parameters.dockerfile
-    - meta_content_scope: string.unquoted.dockerfile
+    - meta_scope: comment.line.containerfile meta.annotation.parameters.containerfile
+    - meta_content_scope: string.unquoted.containerfile
     - match: $\n?
       pop: true
 
   comments:
     - match: ^\s*(#)
       captures:
-        1: punctuation.definition.comment.dockerfile
+        1: punctuation.definition.comment.containerfile
       push: comment-body
 
   comment-body:
-    - meta_scope: comment.line.number-sign.dockerfile
+    - meta_scope: comment.line.number-sign.containerfile
     - match: $\n?
       pop: true
 
@@ -67,7 +67,7 @@ contexts:
       push: inside-line-continuation
 
   inside-line-continuation:
-    - meta_scope: punctuation.separator.continuation.line.dockerfile
+    - meta_scope: punctuation.separator.continuation.line.containerfile
     - match: ^
       pop: true
 
@@ -75,16 +75,16 @@ contexts:
 
   from-expect-name:
     - match: $\n?
-      scope: invalid.illegal.missing-identifier.dockerfile
+      scope: invalid.illegal.missing-identifier.containerfile
       pop: 2
     - match: \s*(?=:@)
-      scope: invalid.illegal.missing-identifier.dockerfile
+      scope: invalid.illegal.missing-identifier.containerfile
       set: from-optional-tag
     - match: ''
       pop: true
 
   from-name-inside:
-    - meta_content_scope: support.module.dockerfile
+    - meta_content_scope: support.module.containerfile
     - include: variable-reference
     - match: (?=[\s:@])
       set: from-optional-tag
@@ -99,15 +99,15 @@ contexts:
   variable-reference:
     - match: (\$)(\{)(\w+)(\})
       captures:
-        0: meta.interpolation.parameter.dockerfile
-        1: punctuation.definition.variable.dockerfile
-        2: punctuation.section.interpolation.begin.dockerfile
-        3: variable.parameter.dockerfile
-        4: punctuation.section.interpolation.end.dockerfile
+        0: meta.interpolation.parameter.containerfile
+        1: punctuation.definition.variable.containerfile
+        2: punctuation.section.interpolation.begin.containerfile
+        3: variable.parameter.containerfile
+        4: punctuation.section.interpolation.end.containerfile
 
   from-optional-tag:
     - match: '[:@]'
-      scope: punctuation.separator.key-value.dockerfile
+      scope: punctuation.separator.key-value.containerfile
       set: [container-tag, expect-container-tag]
     - match: (?=\S)|$
       pop: true
@@ -115,15 +115,15 @@ contexts:
   from-optional-as:
     - match: (?i)\b(as)\s+([-\w]+)
       captures:
-        1: keyword.context.dockerfile
-        2: entity.name.label.dockerfile
+        1: keyword.context.containerfile
+        2: entity.name.label.containerfile
       pop: true
     - match: $
       pop: true
 
   expect-container-tag:
     - match: $\n?
-      scope: invalid.illegal.missing-tag-or-digest.dockerfile
+      scope: invalid.illegal.missing-tag-or-digest.containerfile
       pop: 2
     - match: ''
       pop: true
@@ -134,13 +134,13 @@ contexts:
       set: container-tag-inside
 
   container-tag-inside:
-    - meta_content_scope: support.constant.dockerfile
+    - meta_content_scope: support.constant.containerfile
     - include: variable-reference
     - match: (?=\s)|$
       pop: true
 
   from-line-meta-scope:
-    - meta_scope: meta.namespace.dockerfile
+    - meta_scope: meta.namespace.containerfile
     - match: $\n?
       pop: true
 
@@ -148,9 +148,9 @@ contexts:
 
   optional-instruction-args:
     - match: (--)\w+(?:-[-\w]*)?
-      scope: variable.parameter.dockerfile
+      scope: variable.parameter.containerfile
       captures:
-        1: punctuation.definition.parameter.dockerfile
+        1: punctuation.definition.parameter.containerfile
       push: expect-optional-arg-assignment
     - include: line-continuation
     - match: (?=\S|$)
@@ -158,7 +158,7 @@ contexts:
 
   expect-optional-arg-assignment:
     - match: '='
-      scope: keyword.operator.assignment.dockerfile
+      scope: keyword.operator.assignment.containerfile
       set: expect-optional-arg-value
     - match: (?=\S|$)
       pop: true
@@ -167,31 +167,31 @@ contexts:
     - match: (?=\w+=)
       set: expect-instruction-arg-additional-key
     - match: '[^\s,]+'
-      scope: string.unquoted.dockerfile
+      scope: string.unquoted.containerfile
       set: possible-instruction-arg-value-additional-arguments
     - match: (?=\s|$)
       pop: true
 
   possible-instruction-arg-value-additional-arguments:
     - match: ','
-      scope: punctuation.separator.sequence.dockerfile
+      scope: punctuation.separator.sequence.containerfile
       set: expect-instruction-arg-additional-key
     - match: ''
       pop: true
 
   expect-instruction-arg-additional-key:
     - match: \w+\b
-      scope: variable.parameter.inner.dockerfile
+      scope: variable.parameter.inner.containerfile
       set: expect-optional-arg-assignment
 
 ###[ INSTRUCTIONS ]################################################################################
 
   expect-arg-or-from-instructions:
     - match: (?i)ARG\b
-      scope: keyword.context.dockerfile
+      scope: keyword.context.containerfile
       push: arg-expect-name
     - match: (?i)FROM\b
-      scope: keyword.import.from.dockerfile
+      scope: keyword.import.from.containerfile
       set:
         - expect-instructions
         - from-line-meta-scope
@@ -205,7 +205,7 @@ contexts:
     - include: expect-arg-or-from-instructions
     - match: (?i)^\s*(onbuild)\s+(?={{onbuild_instruction}}\s)
       captures:
-        1: storage.modifier.dockerfile
+        1: storage.modifier.containerfile
       push: instruction
     - match: ^\s*(?=(?:{{onbuild_instruction}}|{{non_onbuild_instruction}})\b)
       push: instruction
@@ -215,43 +215,43 @@ contexts:
   instruction:
     - match: (?i)(ENV)\s(\w+)([ ])
       captures:
-        1: keyword.context.dockerfile
+        1: keyword.context.containerfile
         2: variable.other.readwrite.shell
-        3: invalid.deprecated.missing-equals.dockerfile
+        3: invalid.deprecated.missing-equals.containerfile
       set:
         - match: $
           pop: true
         - include: scope:source.shell.bash#variable-value
     - match: (?i)(ENV)\b
       captures:
-        1: keyword.context.dockerfile
+        1: keyword.context.containerfile
       set:
         - scope:source.shell.bash#cmd-export-args-meta
         - scope:source.shell.bash#cmd-export-args
     - match: (?i)(LABEL)\b
       captures:
-        1: keyword.other.dockerfile
+        1: keyword.other.containerfile
       set:
         - arg-expect-name
     - include: shell-instruction
     - match: (?i)HEALTHCHECK\s+NONE\b
-      scope: keyword.other.dockerfile
+      scope: keyword.other.containerfile
     - match: (?i)HEALTHCHECK\b
-      scope: keyword.other.dockerfile
+      scope: keyword.other.containerfile
       set:
         - scope:source.shell.bash#cmd-args
         - optional-cmd
         - optional-instruction-args
     - match: '{{onbuild_instruction}}(?=\s)'
-      scope: keyword.other.dockerfile
+      scope: keyword.other.containerfile
       set: scope:source.shell.bash#cmd-args # TODO: set optional-instruction-args first?
     - match: '{{non_onbuild_instruction}}(?=\s)'
-      scope: keyword.other.dockerfile
+      scope: keyword.other.containerfile
       set: scope:source.shell.bash#cmd-args
 
   shell-instruction:
     - match: '{{shell_instruction}}\b'
-      scope: keyword.other.dockerfile
+      scope: keyword.other.containerfile
       set:
         - shell-instruction-args
         - optional-instruction-args
@@ -261,16 +261,16 @@ contexts:
   shell-instruction-args:
     - match: \s*(\[)
       captures:
-        1: punctuation.section.sequence.begin.dockerfile
+        1: punctuation.section.sequence.begin.containerfile
       set: inside-shell-json-array-of-strings
     - match: '[ \t]*(?!{{escape_character}}$)(?=\S)'
       set: embedded_shell
     - match: $\n?
-      scope: invalid.illegal.missing-shell-instruction.dockerfile
+      scope: invalid.illegal.missing-shell-instruction.containerfile
       pop: 1
 
   inside-shell-json-array-of-strings:
-    - meta_scope: meta.sequence.dockerfile
+    - meta_scope: meta.sequence.containerfile
     - match: \]
       scope: invalid.illegal.expected-string.json
     - match: \"
@@ -284,7 +284,7 @@ contexts:
     - include: line-continuation
     - include: comments
     - match: $\n
-      scope: invalid.illegal.line-end.dockerfile
+      scope: invalid.illegal.line-end.containerfile
       pop: true
 
   inside-json-string:
@@ -310,7 +310,7 @@ contexts:
       pop: true
 
   embedded_shell:
-    - meta_scope: source.shell.bash.embedded.dockerfile
+    - meta_scope: source.shell.bash.embedded.containerfile
     - include: line-continuation
     - match: $
       pop: true
@@ -319,7 +319,7 @@ contexts:
   optional-cmd:
     - include: line-continuation
     - match: (?i)CMD\b
-      scope: keyword.other.dockerfile
+      scope: keyword.other.containerfile
       set: shell-instruction-args
     - match: ''
       pop: true
@@ -327,7 +327,7 @@ contexts:
 ####[ ARG INSTRUCTION ]############################################################################
 
   arg-expect-name:
-    - meta_content_scope: variable.parameter.dockerfile
+    - meta_content_scope: variable.parameter.containerfile
     - match: $
       pop: true
     - match: =

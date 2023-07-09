@@ -1,4 +1,4 @@
-# SYNTAX TEST "Dockerfile.sublime-syntax"
+# SYNTAX TEST "Containerfile.sublime-syntax"
 # syntax=docker/dockerfile:1
 # escape=`
 # <- comment.line meta.annotation punctuation.definition.annotation
@@ -20,6 +20,6 @@ RUN Get-CimInstance -ComputerName localhost win32_logicaldisk `
 | foreach-object {write " $($_.caption) $('{0:N2}' `
   -f ($_.Size/1gb)) GB total, $('{0:N2}' `
   -f ($_.FreeSpace/1gb)) GB free "}
-# ^^ source.dockerfile source.powershell.embedded meta.block string.quoted.double interpolated.complex.source keyword.operator.string-format
+# ^^ source.containerfile source.powershell.embedded meta.block string.quoted.double interpolated.complex.source keyword.operator.string-format
 
 # <- - source.powershell

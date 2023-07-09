@@ -1,4 +1,4 @@
-# SYNTAX TEST partial-symbols "Dockerfile.sublime-syntax"
+# SYNTAX TEST partial-symbols "Containerfile.sublime-syntax"
 # syntax=docker/dockerfile:1
 
 #directive=value
@@ -50,10 +50,10 @@ FROM python_builder AS test
 #                      @@@@ definition
 
 ARG POETRY_HTTP_BASIC_AZURE_PASSWORD
-# ^ keyword.context.dockerfile
-#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.parameter.dockerfile
+# ^ keyword.context.containerfile
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.parameter.containerfile
 ENV POETRY_HTTP_BASIC_AZURE_USER="docker"
-# ^ keyword.context.dockerfile
+# ^ keyword.context.containerfile
 #   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.other.readwrite.shell
 #                               ^ keyword.operator.assignment.shell
 #                                ^^^^^^^^ string.quoted.double.shell
@@ -103,7 +103,7 @@ RUN python -m venv /opt/venv && \
   pip install -U pip && \
   cd /opt/project && \
   poetry install --no-dev --no-interaction
-# ^^^^^^ source.shell.bash.embedded.dockerfile meta.function-call.identifier variable.function
+# ^^^^^^ source.shell.bash.embedded.containerfile meta.function-call.identifier variable.function
 #        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell meta.function-call.arguments
 #                                         ^ - source.shell
 #                ^^ meta.parameter.option variable.parameter.option punctuation.definition.parameter
@@ -209,8 +209,8 @@ HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost/ || exit 1
 
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost/ || exit 1
-# ^^^ keyword.other.dockerfile
-#     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell.bash.embedded.dockerfile
+# ^^^ keyword.other.containerfile
+#     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.shell.bash.embedded.containerfile
 
 # syntax=docker/dockerfile:1
 FROM debian
@@ -219,7 +219,7 @@ RUN <<EOT bash
   apt-get install -y something
   # TODO: scope as bash script
 EOT
-# <- source.shell.bash.embedded.dockerfile meta.string.heredoc.shell meta.tag.heredoc.shell entity.name.tag.heredoc.shell
+# <- source.shell.bash.embedded.containerfile meta.string.heredoc.shell meta.tag.heredoc.shell entity.name.tag.heredoc.shell
 #  ^ - meta.string
 
 # syntax=docker/dockerfile:1
@@ -235,34 +235,34 @@ FROM ubuntu
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked apt update && apt-get --no-install-recommends install -y gcc
-# ^^ variable.parameter.dockerfile punctuation.definition.parameter.dockerfile
-#   ^^^^^ variable.parameter.dockerfile
-#        ^ keyword.operator.assignment.dockerfile
-#         ^^^^ variable.parameter.inner.dockerfile
-#             ^ keyword.operator.assignment.dockerfile
-#              ^^^^^ string.unquoted.dockerfile
-#                   ^ punctuation.separator.sequence.dockerfile
-#                    ^^^^^^ variable.parameter.inner.dockerfile
-#                          ^ keyword.operator.assignment.dockerfile
-#                           ^^^^^^^^^^^^ string.unquoted.dockerfile
-#                                       ^ punctuation.separator.sequence.dockerfile
-#                                        ^^^^^^^ variable.parameter.inner.dockerfile
-#                                               ^ keyword.operator.assignment.dockerfile
-#                                                ^^^^^^ string.unquoted.dockerfile
-#                                                       ^^^ source.shell.bash.embedded.dockerfile meta.function-call.identifier.shell variable.function.shell
+# ^^ variable.parameter.containerfile punctuation.definition.parameter.containerfile
+#   ^^^^^ variable.parameter.containerfile
+#        ^ keyword.operator.assignment.containerfile
+#         ^^^^ variable.parameter.inner.containerfile
+#             ^ keyword.operator.assignment.containerfile
+#              ^^^^^ string.unquoted.containerfile
+#                   ^ punctuation.separator.sequence.containerfile
+#                    ^^^^^^ variable.parameter.inner.containerfile
+#                          ^ keyword.operator.assignment.containerfile
+#                           ^^^^^^^^^^^^ string.unquoted.containerfile
+#                                       ^ punctuation.separator.sequence.containerfile
+#                                        ^^^^^^^ variable.parameter.inner.containerfile
+#                                               ^ keyword.operator.assignment.containerfile
+#                                                ^^^^^^ string.unquoted.containerfile
+#                                                       ^^^ source.shell.bash.embedded.containerfile meta.function-call.identifier.shell variable.function.shell
 
 RUN --mount=type=bind,source=./for_mounting,target=/app,readonly do_something
-#                                                      ^ punctuation.separator.sequence.dockerfile
-#                                                       ^^^^^^^^ variable.parameter.inner.dockerfile
+#                                                      ^ punctuation.separator.sequence.containerfile
+#                                                       ^^^^^^^^ variable.parameter.inner.containerfile
 #                                                                ^^^^^^^^^^^^ variable.function.shell
 
 RUN \
 
-# <- invalid.illegal.missing-shell-instruction.dockerfile
+# <- invalid.illegal.missing-shell-instruction.containerfile
 
 LABEL org.opencontainers.image.authors="SvenDowideit@home.org.au"
-# ^^^ keyword.other.dockerfile
-#     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.parameter.dockerfile
+# ^^^ keyword.other.containerfile
+#     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.parameter.containerfile
 #                                     ^ keyword.operator.assignment.bash
 
 #https://stackoverflow.com/a/60820156/4473405
@@ -281,12 +281,12 @@ ENV VAR=FALSE
 
 FROM branch-version-${my_arg} AS final
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid
-#    ^^^^^^^^^^^^^^^^^^^^^^^^ support.module.dockerfile
-#                   ^^^^^^^^^ meta.interpolation.parameter.dockerfile
+#    ^^^^^^^^^^^^^^^^^^^^^^^^ support.module.containerfile
+#                   ^^^^^^^^^ meta.interpolation.parameter.containerfile
 #                   ^ punctuation.definition.variable
-#                    ^ punctuation.section.interpolation.begin.dockerfile - variable
+#                    ^ punctuation.section.interpolation.begin.containerfile - variable
 #                     ^^^^^^ variable.parameter
-#                           ^ punctuation.section.interpolation.end.dockerfile - variable
+#                           ^ punctuation.section.interpolation.end.containerfile - variable
 #                            ^ - support
 #                             ^^ keyword.context
 #                                ^^^^^ entity.name.label
@@ -299,9 +299,9 @@ FROM some_image:v${my_arg} AS another
 #              ^ punctuation.separator.key-value
 #               ^^^^^^^^^^ support.constant
 #                ^ punctuation.definition.variable
-#                 ^ punctuation.section.interpolation.begin.dockerfile - variable
+#                 ^ punctuation.section.interpolation.begin.containerfile - variable
 #                  ^^^^^^ variable.parameter
-#                        ^ punctuation.section.interpolation.end.dockerfile - variable
+#                        ^ punctuation.section.interpolation.end.containerfile - variable
 #                         ^ - support
 #                          ^^ keyword.context
 #                            ^ - keyword - entity
@@ -309,19 +309,19 @@ FROM some_image:v${my_arg} AS another
 
 
 HEALTHCHECK --start-period=10s --interval=5s --retries=10 --timeout=3s CMD /opt/mssql-tools/bin/sqlcmd -d some_database -U sa -P some_sa_pa55word -Q 'SELECT 1;'
-# ^^^^^^^^^ keyword.other.dockerfile
-#           ^^ punctuation.definition.parameter.dockerfile
-#             ^^^^^^^^^^^^ variable.parameter.dockerfile
-#                         ^ keyword.operator.assignment.dockerfile
-#                          ^^^ string.unquoted.dockerfile
+# ^^^^^^^^^ keyword.other.containerfile
+#           ^^ punctuation.definition.parameter.containerfile
+#             ^^^^^^^^^^^^ variable.parameter.containerfile
+#                         ^ keyword.operator.assignment.containerfile
+#                          ^^^ string.unquoted.containerfile
 
 ENTRYPOINT [\
     "sh",\
     # comment halfway through with no line continuation required
-    # <- punctuation.definition.comment.dockerfile
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign.dockerfile
+    # <- punctuation.definition.comment.containerfile
+    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign.containerfile
     "-c","echo hello $NAME"]
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.sequence.dockerfile - invalid
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.sequence.containerfile - invalid
 #   ^^^^ string.quoted.double.json
 #       ^ punctuation.separator.sequence
 #        ^^^^^^^^^^^^^^^^^^ string.quoted.double.json
@@ -329,40 +329,40 @@ ENTRYPOINT [\
 #                           ^ - illegal - meta.sequence
 
 HEALTHCHECK NONE
-# ^^^^^^^^^^^^^^ keyword.other.dockerfile
+# ^^^^^^^^^^^^^^ keyword.other.containerfile
 
 ENTRYPOINT [\
     "sh", "-c",\
     "echo \"testing\\\u002b\""\
     #     ^^ constant.character.escape.json
     #              ^^^^^^^^^^ constant.character.escape.json
-    #                        ^ meta.sequence.dockerfile string.quoted.double.json punctuation.definition.string.end.json
-    #                         ^^ meta.sequence.dockerfile punctuation.separator.continuation.line.dockerfile
+    #                        ^ meta.sequence.containerfile string.quoted.double.json punctuation.definition.string.end.json
+    #                         ^^ meta.sequence.containerfile punctuation.separator.continuation.line.containerfile
 ]
-# <- meta.sequence.dockerfile punctuation.section.sequence.end.json
+# <- meta.sequence.containerfile punctuation.section.sequence.end.json
 
 ENTRYPOINT ["sh", "-c","echo testing",]
-# ^^^^^^^^ keyword.other.dockerfile
+# ^^^^^^^^ keyword.other.containerfile
 #          ^^^^^^^^^^^^^^^^^^^^^^^^^^^ - invalid
-#          ^ punctuation.section.sequence.begin.dockerfile
+#          ^ punctuation.section.sequence.begin.containerfile
 #           ^ punctuation.definition.string.begin.json
 #           ^^^^ string.quoted.double.json
 #              ^ punctuation.definition.string.end.json
 #               ^ punctuation.separator.sequence.json
-#                                     ^ meta.sequence.dockerfile invalid.illegal.expected-string.json
+#                                     ^ meta.sequence.containerfile invalid.illegal.expected-string.json
 
 ENTRYPOINT ["something"]
-# ^^^^^^^^ keyword.other.dockerfile
-#          ^^^^^^^^^^^^^ meta.sequence.dockerfile - invalid
+# ^^^^^^^^ keyword.other.containerfile
+#          ^^^^^^^^^^^^^ meta.sequence.containerfile - invalid
 #                       ^ - meta.sequence
 #           ^^^^^^^^^^^ string.quoted.double.json
 
 ENTRYPOINT []
-# ^^^^^^^^ keyword.other.dockerfile
-#          ^ meta.sequence.dockerfile punctuation.section.sequence.begin.dockerfile
-#           ^ meta.sequence.dockerfile invalid.illegal.expected-string.json
+# ^^^^^^^^ keyword.other.containerfile
+#          ^ meta.sequence.containerfile punctuation.section.sequence.begin.containerfile
+#           ^ meta.sequence.containerfile invalid.illegal.expected-string.json
 
 ENTRYPOINT [
-# ^^^^^^^^ keyword.other.dockerfile
-#          ^ meta.sequence.dockerfile punctuation.section.sequence.begin.dockerfile
-#           ^ meta.sequence.dockerfile invalid.illegal.line-end.dockerfile
+# ^^^^^^^^ keyword.other.containerfile
+#          ^ meta.sequence.containerfile punctuation.section.sequence.begin.containerfile
+#           ^ meta.sequence.containerfile invalid.illegal.line-end.containerfile
