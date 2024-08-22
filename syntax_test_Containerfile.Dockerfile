@@ -260,6 +260,12 @@ RUN \
 
 # <- invalid.illegal.missing-shell-instruction.containerfile
 
+RUN apt-get -y update && \
+    # comment eaten by Docker, not passed to shell
+    apt-get install something
+#   ^^^^^^^ source.shell.bash.embedded.containerfile variable.function.shell
+# <- comment.line.number-sign.containerfile punctuation.definition.comment.containerfile - source.shell
+
 LABEL org.opencontainers.image.authors="SvenDowideit@home.org.au"
 # ^^^ keyword.other.containerfile
 #     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ variable.parameter.containerfile

@@ -62,6 +62,11 @@ contexts:
     - match: $\n?
       pop: true
 
+  comment-body-eat-line-ending:
+    - meta_scope: comment.line.number-sign.containerfile
+    - match: ^
+      pop: true
+
   line-continuation:
     - match: '{{escape_character}}$\n?'
       push: inside-line-continuation
@@ -292,7 +297,7 @@ contexts:
     - match: \"
       scope: punctuation.definition.string.end.json
       pop: 1
-    - include: scope:source.json#string-escape
+    - include: scope:source.json#string-escapes
     - match: $\n
       scope: invalid.illegal.unclosed-string.json
       pop: 1
@@ -312,6 +317,10 @@ contexts:
   embedded_shell:
     - meta_scope: source.shell.bash.embedded.containerfile
     - include: line-continuation
+    - match: ^\s+(#)
+      captures:
+        1: punctuation.definition.comment.containerfile
+      push: comment-body-eat-line-ending
     - match: $
       pop: true
     - include: scope:source.shell.bash#statements
