@@ -292,7 +292,7 @@ contexts:
     - match: \"
       scope: punctuation.definition.string.end.json
       pop: 1
-    - include: scope:source.json#string-escape
+    - include: scope:source.json#string-escapes
     - match: $\n
       scope: invalid.illegal.unclosed-string.json
       pop: 1
