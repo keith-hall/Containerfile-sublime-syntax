@@ -77,9 +77,9 @@ RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poet
 #        ^^^^ meta.parameter.option variable.parameter.option
 #        ^ punctuation.definition.parameter
 #                                                                                     ^ keyword.operator.assignment.pipe
-#                                                                                       ^^^^^^^^^^^^^^ meta.variable variable.other.readwrite
+#                                                                                       ^^^^^^^^^^^^^^ variable.other.readwrite
 #                                                                                                     ^ keyword.operator.assignment
-#                                                                                                      ^ meta.number.integer.decimal constant.numeric.value
+#                                                                                                      ^ meta.string string.unquoted.shell
 #                                                                                                        ^^^^^^ meta.function-call.identifier variable.function
 
 ENV PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
@@ -91,7 +91,7 @@ ENV PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
 #                                         ^^^^^^^ meta.interpolation.parameter
 #                                         ^ punctuation.definition.variable
 #                                          ^ punctuation.section.interpolation.begin
-#                                           ^^^^ variable.other.readwrite
+#                                           ^^^^ variable.language.builtin
 #                                               ^ punctuation.section.interpolation.end
 #                                                ^ string.quoted.double punctuation.definition.string.end
 
@@ -136,13 +136,13 @@ COPY --from=python_builder /opt /opt
 # Add the VirtualEnv to the beginning of $PATH
 ENV PATH="/opt/venv/bin:$PATH"
 # ^ keyword.context
-#   ^^^^ meta.function-call.arguments meta.variable variable.other.readwrite
+#   ^^^^ meta.function-call.arguments variable.language.builtin
 #       ^ meta.function-call.arguments keyword.operator.assignment
 #        ^^^^^^^^^^^^^^^^^^^^^ meta.function-call.arguments meta.string
 #        ^ string.quoted.double punctuation.definition.string.begin
 #         ^^^^^^^^^^^^^^ string.quoted.double
-#                       ^ meta.interpolation.parameter variable.other.readwrite punctuation.definition.variable
-#                        ^^^^ meta.interpolation.parameter variable.other.readwrite
+#                       ^ meta.interpolation.parameter variable.language.builtin punctuation.definition.variable
+#                        ^^^^ meta.interpolation.parameter variable.language.builtin
 #                            ^ string.quoted.double punctuation.definition.string.end
 
 # -------------------------------
@@ -219,7 +219,7 @@ RUN <<EOT bash
   apt-get install -y something
   # TODO: scope as bash script
 EOT
-# <- source.shell.bash.embedded.containerfile meta.string.heredoc.shell meta.tag.heredoc.shell entity.name.tag.heredoc.shell
+# <- source.shell.bash.embedded.containerfile meta.redirection.shell meta.tag.heredoc.end.shell entity.name.tag.heredoc.shell
 #  ^ - meta.string
 
 # syntax=docker/dockerfile:1
@@ -262,9 +262,12 @@ RUN \
 
 RUN apt-get -y update && \
     # comment eaten by Docker, not passed to shell
+    # <- comment.line.number-sign.containerfile punctuation.definition.comment.containerfile
+    #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign.containerfile
     apt-get install something
+# <- source.shell.bash.embedded.containerfile - comment - variable
+#^^^ source.shell.bash.embedded.containerfile - comment - variable
 #   ^^^^^^^ source.shell.bash.embedded.containerfile variable.function.shell
-# <- comment.line.number-sign.containerfile punctuation.definition.comment.containerfile - source.shell
 
 LABEL org.opencontainers.image.authors="SvenDowideit@home.org.au"
 # ^^^ keyword.other.containerfile
