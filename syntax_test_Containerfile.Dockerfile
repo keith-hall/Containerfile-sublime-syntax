@@ -13,6 +13,16 @@
 #             ^^^^^^ meta.annotation.parameters
 #             ^^^^^ string.unquoted
 
+ARG abc=def
+# ^ keyword.context.containerfile
+#   ^^^ variable.parameter.containerfile
+#      ^ keyword.operator.assignment.bash
+#       ^^^ meta.variable.shell variable.other.readwrite.shell
+
+# comment between ARG and first FROM
+# <- comment.line.number-sign.containerfile punctuation.definition.comment.containerfile
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign.containerfile
+
 FROM python:3-alpine as python_builder
 # <- meta.namespace
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid

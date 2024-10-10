@@ -204,6 +204,7 @@ contexts:
         - from-name
         - from-expect-name
         - optional-instruction-args
+    - include: comments
 
   expect-instructions:
     - include: comments
