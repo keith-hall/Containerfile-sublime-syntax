@@ -227,12 +227,12 @@ contexts:
       set:
         - match: $
           pop: true
-        - include: scope:source.shell.bash#variable-value
+        - include: scope:source.shell.bash#literal-array-value
     - match: (?i)(ENV)\b
       captures:
         1: keyword.context.containerfile
       set:
-        - scope:source.shell.bash#cmd-export-args-meta
+        - scope:source.shell.bash#cmd-args-meta
         - scope:source.shell.bash#cmd-export-args
     - match: (?i)(LABEL)\b
       captures:
@@ -245,15 +245,20 @@ contexts:
     - match: (?i)HEALTHCHECK\b
       scope: keyword.other.containerfile
       set:
+        - scope:source.shell.bash#cmd-args-meta
         - scope:source.shell.bash#cmd-args
         - optional-cmd
         - optional-instruction-args
     - match: '{{onbuild_instruction}}(?=\s)'
       scope: keyword.other.containerfile
-      set: scope:source.shell.bash#cmd-args # TODO: set optional-instruction-args first?
+      set:
+        - scope:source.shell.bash#cmd-args-meta
+        - scope:source.shell.bash#cmd-args # TODO: set optional-instruction-args first?
     - match: '{{non_onbuild_instruction}}(?=\s)'
       scope: keyword.other.containerfile
-      set: scope:source.shell.bash#cmd-args
+      set:
+        - scope:source.shell.bash#cmd-args-meta
+        - scope:source.shell.bash#cmd-args
 
   shell-instruction:
     - match: '{{shell_instruction}}\b'
@@ -343,5 +348,5 @@ contexts:
     - match: =
       scope: keyword.operator.assignment.bash
       set:
-        - scope:source.shell.bash#cmd-export-args-meta
+        - scope:source.shell.bash#cmd-args-meta
         - scope:source.shell.bash#cmd-export-args
