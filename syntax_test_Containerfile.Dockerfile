@@ -17,7 +17,7 @@ ARG abc=def
 # ^ keyword.context.containerfile
 #   ^^^ variable.parameter.containerfile
 #      ^ keyword.operator.assignment.bash
-#       ^^^ meta.variable.shell variable.other.readwrite.shell
+#       ^^^ variable.other.readwrite.shell
 
 # comment between ARG and first FROM
 # <- comment.line.number-sign.containerfile punctuation.definition.comment.containerfile
@@ -301,11 +301,11 @@ ENV VAR=FALSE
 FROM branch-version-${my_arg} AS final
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid
 #    ^^^^^^^^^^^^^^^^^^^^^^^^ support.module.containerfile
-#                   ^^^^^^^^^ meta.interpolation.parameter.containerfile
+#                   ^^^^^^^^^ meta.interpolation.parameter
 #                   ^ punctuation.definition.variable
-#                    ^ punctuation.section.interpolation.begin.containerfile - variable
-#                     ^^^^^^ variable.parameter
-#                           ^ punctuation.section.interpolation.end.containerfile - variable
+#                    ^ punctuation.section.interpolation.begin - variable
+#                     ^^^^^^ variable
+#                           ^ punctuation.section.interpolation.end - variable
 #                            ^ - support
 #                             ^^ keyword.context
 #                                ^^^^^ entity.name.label
@@ -318,13 +318,55 @@ FROM some_image:v${my_arg} AS another
 #              ^ punctuation.separator.key-value
 #               ^^^^^^^^^^ support.constant
 #                ^ punctuation.definition.variable
-#                 ^ punctuation.section.interpolation.begin.containerfile - variable
-#                  ^^^^^^ variable.parameter
-#                        ^ punctuation.section.interpolation.end.containerfile - variable
+#                 ^ punctuation.section.interpolation.begin - variable
+#                  ^^^^^^ variable
+#                        ^ punctuation.section.interpolation.end - variable
 #                         ^ - support
 #                          ^^ keyword.context
 #                            ^ - keyword - entity
 #                             ^^^^^ entity.name.label
+
+
+# https://docs.docker.com/reference/dockerfile/#environment-replacement
+# Environment variables are notated in the Dockerfile either with $variable_name or ${variable_name}. They are treated equivalently and the brace syntax is typically used to address issues with variable names with no whitespace, like ${foo}_bar.
+
+# The ${variable_name} syntax also supports a few of the standard bash modifiers as specified below:
+
+# ${variable:-word} indicates that if variable is set then the result will be that value. If variable is not set then word will be the result.
+# ${variable:+word} indicates that if variable is set then word will be the result, otherwise the result is the empty string.
+
+FROM some_image:${VARIABLE:-default} AS some_stage
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace.containerfile
+#^^^ keyword.import.from.containerfile
+#    ^^^^^^^^^^ support.module.containerfile
+#              ^ punctuation.separator.key-value.containerfile
+#               ^^^^^^^^^^^^^^^^^^^^ support.constant.containerfile meta.interpolation.parameter.shell
+#               ^ punctuation.definition.variable.shell
+#                ^ punctuation.section.interpolation.begin.shell
+#                 ^^^^^^^^ variable.other.readwrite.shell
+#                         ^^ keyword.operator.assignment.shell
+#                           ^^^^^^^ meta.string.regexp.shell string.unquoted.shell
+#                                  ^ punctuation.section.interpolation.end.shell
+#                                    ^^ keyword.context.containerfile
+#                                       ^^^^^^^^^^ entity.name.label.containerfile
+LABEL example="foo-$ENV_VAR"
+#^^^^ keyword.other.containerfile
+#    ^^^^^^^^ variable.parameter.containerfile
+#            ^ keyword.operator.assignment.bash
+#             ^^^^^^^^^^^^^^ meta.function-call.arguments.shell meta.assignment.l-value.shell
+#             ^^^^^ variable.other.readwrite.shell
+#             ^ punctuation.definition.quoted.begin.shell
+#                  ^^^^^^^^ meta.interpolation.parameter.shell variable.other.readwrite.shell
+#                  ^ punctuation.definition.variable.shell
+#                          ^ variable.other.readwrite.shell punctuation.definition.quoted.end.shell
+LABEL example='foo-$ENV_VAR'
+#^^^^ keyword.other.containerfile
+#    ^^^^^^^^ variable.parameter.containerfile
+#            ^ keyword.operator.assignment.bash
+#             ^^^^^^^^^^^^^^ meta.function-call.arguments.shell meta.assignment.l-value.shell variable.other.readwrite.shell
+#             ^ punctuation.definition.quoted.begin.shell
+#                  ^ - punctuation
+#                          ^ punctuation.definition.quoted.end.shell
 
 
 HEALTHCHECK --start-period=10s --interval=5s --retries=10 --timeout=3s CMD /opt/mssql-tools/bin/sqlcmd -d some_database -U sa -P some_sa_pa55word -Q 'SELECT 1;'

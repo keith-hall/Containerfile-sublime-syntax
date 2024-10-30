@@ -102,13 +102,14 @@ contexts:
       set: from-name-inside
 
   variable-reference:
-    - match: (\$)(\{)(\w+)(\})
-      captures:
-        0: meta.interpolation.parameter.containerfile
-        1: punctuation.definition.variable.containerfile
-        2: punctuation.section.interpolation.begin.containerfile
-        3: variable.parameter.containerfile
-        4: punctuation.section.interpolation.end.containerfile
+    # - match: (\$)(\{)(\w+)(\})
+    #   captures:
+    #     0: meta.interpolation.parameter.containerfile
+    #     1: punctuation.definition.variable.containerfile
+    #     2: punctuation.section.interpolation.begin.containerfile
+    #     3: variable.parameter.containerfile
+    #     4: punctuation.section.interpolation.end.containerfile
+    - include: scope:source.shell.bash#variable-expansions
 
   from-optional-tag:
     - match: '[:@]'
