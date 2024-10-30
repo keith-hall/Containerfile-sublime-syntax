@@ -172,6 +172,7 @@ contexts:
   expect-optional-arg-value:
     - match: (?=\w+=)
       set: expect-instruction-arg-additional-key
+    - include: variable-reference
     - match: '[^\s,]+'
       scope: string.unquoted.containerfile
       set: possible-instruction-arg-value-additional-arguments

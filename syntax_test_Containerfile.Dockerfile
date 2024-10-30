@@ -52,6 +52,44 @@ FROM --platform=linux/amd64 python:3-alpine as python-builder2
 #                                              ^^^^^^^^^^^^^^^ entity.name.label
 #                                                             ^ - entity
 
+FROM --platform=$BUILDPLATFORM ubuntu
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace.containerfile
+#^^^ keyword.import.from.containerfile
+#    ^^^^^^^^^^ variable.parameter.containerfile
+#    ^^ punctuation.definition.parameter.containerfile
+#              ^ keyword.operator.assignment.containerfile
+#               ^^^^^^^^^^^^^^ meta.interpolation.parameter.shell variable.other.readwrite.shell
+#               ^ punctuation.definition.variable.shell
+#                              ^^^^^^ support.module.containerfile
+
+# indented instructions also work fine
+  FROM --platform=linux/amd64 abc:1.2.3
+
+FROM --platform=linux/amd64 \
+    abc:1.2.3
+#^^^^^^^^^^^^ meta.namespace.containerfile
+#   ^^^ support.module.containerfile
+#      ^ punctuation.separator.key-value.containerfile
+#       ^^^^^ support.constant.containerfile
+
+  FROM \
+   --platform=linux/amd64 abc:1.2.3
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace.containerfile
+#  ^^^^^^^^^^ variable.parameter.containerfile
+#  ^^ punctuation.definition.parameter.containerfile
+#            ^ keyword.operator.assignment.containerfile
+#             ^^^^^^^^^^^ string.unquoted.containerfile
+#                         ^^^ support.module.containerfile
+#                            ^ punctuation.separator.key-value.containerfile
+#                             ^^^^^ support.constant.containerfile
+  FROM \
+    --platform=linux/amd64 \
+    abc:1.2.3 
+#^^^^^^^^^^^^^ meta.namespace.containerfile
+#   ^^^ support.module.containerfile
+#      ^ punctuation.separator.key-value.containerfile
+#       ^^^^^ support.constant.containerfile
+
 FROM python_builder AS test
 #    @@@@@@@@@@@@@@ reference
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^ - invalid
