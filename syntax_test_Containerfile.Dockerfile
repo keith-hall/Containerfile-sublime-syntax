@@ -40,7 +40,7 @@ ARG abc=def
 # <- comment.line.number-sign.containerfile punctuation.definition.comment.containerfile
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign.containerfile
 
-FROM python:3-alpine as python_builder
+FROM python:3-alpine AS python_builder
 # <- meta.namespace
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid
 # <- keyword.import.from
@@ -53,7 +53,35 @@ FROM python:3-alpine as python_builder
 #                       @@@@@@@@@@@@@@ definition
 
 # notadirective=because appears after a builder instruction
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign - meta.annotation - meta.namespace
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.number-sign - meta.annotation - meta.namespace - keyword - variable
+
+# -----------------------------------------------------
+# BuildKit treats lines that begin with # as a comment, unless the line is a valid parser directive. A # marker anywhere else in a line is treated as an argument. This allows statements like:
+RUN echo 'we are running some # of cool things'
+# Comment lines are removed before the Dockerfile instructions are executed. The comment in the following example is removed before the shell executes the echo command.
+RUN echo hello \
+# comment
+world
+
+# The following example is equivalent.
+RUN echo hello \
+world
+# Comments don't support line continuation characters.
+# Note on whitespace
+# For backward compatibility, leading whitespace before comments (#) and instructions (such as RUN) are ignored, but discouraged. Leading whitespace is not preserved in these cases, and the following examples are therefore equivalent:
+
+        # this is a comment-line
+    RUN echo hello
+RUN echo world
+
+# this is a comment-line
+RUN echo hello
+RUN echo world
+# Whitespace in instruction arguments, however, isn't ignored. The following example prints hello world with leading whitespace as specified:
+RUN echo "\
+     hello\
+     world"
+# -----------------------------------------------------
 
 FROM --platform=linux/amd64 python:3-alpine as python-builder2
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.namespace - invalid
