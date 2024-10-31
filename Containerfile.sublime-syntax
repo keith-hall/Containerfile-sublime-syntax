@@ -48,6 +48,12 @@ contexts:
   parser-directive-value:
     - meta_scope: comment.line.containerfile meta.annotation.parameters.containerfile
     - meta_content_scope: string.unquoted.containerfile
+    - match: (\w+)(=)
+      captures:
+        1: variable.parameter.containerfile
+        2: keyword.operator.assignment.containerfile
+    - match: ','
+      scope: punctuation.separator.sequence.containerfile
     - match: $\n?
       pop: true
 

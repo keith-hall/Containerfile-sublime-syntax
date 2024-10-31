@@ -12,6 +12,23 @@
 #            ^ meta.annotation keyword.operator.assignment
 #             ^^^^^^ meta.annotation.parameters
 #             ^^^^^ string.unquoted
+#check=error=true
+#^^^^^^^^^^^^^^^^^ comment.line
+#^^^^^ meta.annotation.identifier variable.language
+#     ^ meta.annotation.parameters keyword.operator.assignment
+#      ^^^^^^^^^^ meta.annotation.parameters string.unquoted
+#      ^^^^^ variable.parameter
+#           ^ keyword.operator.assignment
+#            ^^^^ - variable - keyword
+# check=skip=JSONArgsRecommended,StageNameCasing
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line
+# <- comment.line meta.annotation punctuation.definition.annotation
+# ^^^^^ meta.annotation.identifier variable.language
+#      ^ meta.annotation.parameters keyword.operator.assignment
+#       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.annotation.parameters string.unquoted
+#       ^^^^ variable.parameter
+#           ^ keyword.operator.assignment
+#                               ^ punctuation.separator.sequence - keyword - variable
 
 ARG abc=def
 # ^ keyword.context.containerfile
