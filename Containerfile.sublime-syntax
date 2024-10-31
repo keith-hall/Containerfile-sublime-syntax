@@ -240,7 +240,6 @@ contexts:
       captures:
         1: keyword.context.containerfile
       set:
-        - scope:source.shell.bash#cmd-args-meta
         - scope:source.shell.bash#cmd-export-args
     - match: (?i)(LABEL)\b
       captures:
@@ -357,5 +356,5 @@ contexts:
     - match: =
       scope: keyword.operator.assignment.bash
       set:
-        - scope:source.shell.bash#cmd-args-meta
-        - scope:source.shell.bash#cmd-export-args
+        - scope:source.shell.bash#assignment-value-meta
+        - scope:source.shell.bash#literal-array-value

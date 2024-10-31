@@ -34,7 +34,7 @@ ARG abc=def
 # ^ keyword.context.containerfile
 #   ^^^ variable.parameter.containerfile
 #      ^ keyword.operator.assignment.bash
-#       ^^^ variable.other.readwrite.shell
+#       ^^^^ - variable
 
 # comment between ARG and first FROM
 # <- comment.line.number-sign.containerfile punctuation.definition.comment.containerfile
@@ -229,9 +229,9 @@ COPY --from=python_builder /opt /opt
 # Add the VirtualEnv to the beginning of $PATH
 ENV PATH="/opt/venv/bin:$PATH"
 # ^ keyword.context
-#   ^^^^ meta.function-call.arguments variable.language.builtin
-#       ^ meta.function-call.arguments keyword.operator.assignment
-#        ^^^^^^^^^^^^^^^^^^^^^ meta.function-call.arguments meta.string
+#   ^^^^ meta.assignment.l-value.shell variable.language.builtin
+#       ^ meta.assignment.shell keyword.operator.assignment
+#        ^^^^^^^^^^^^^^^^^^^^^ meta.assignment.r-value.shell meta.string
 #        ^ string.quoted.double punctuation.definition.string.begin
 #         ^^^^^^^^^^^^^^ string.quoted.double
 #                       ^ meta.interpolation.parameter variable.language.builtin punctuation.definition.variable
@@ -436,21 +436,20 @@ LABEL example="foo-$ENV_VAR"
 #^^^^ keyword.other.containerfile
 #    ^^^^^^^^ variable.parameter.containerfile
 #            ^ keyword.operator.assignment.bash
-#             ^^^^^^^^^^^^^^ meta.function-call.arguments.shell meta.assignment.l-value.shell
-#             ^^^^^ variable.other.readwrite.shell
-#             ^ punctuation.definition.quoted.begin.shell
+#             ^^^^^^^^^^^^^^ meta.assignment.r-value.shell - meta.function-call
+#             ^ punctuation.definition.string.begin.shell
+#              ^^^^ meta.assignment.r-value.shell meta.string.glob.shell string.quoted.double.shell - variable
 #                  ^^^^^^^^ meta.interpolation.parameter.shell variable.other.readwrite.shell
 #                  ^ punctuation.definition.variable.shell
-#                          ^ variable.other.readwrite.shell punctuation.definition.quoted.end.shell
+#                          ^ punctuation.definition.string.end.shell - bariable
 LABEL example='foo-$ENV_VAR'
 #^^^^ keyword.other.containerfile
 #    ^^^^^^^^ variable.parameter.containerfile
 #            ^ keyword.operator.assignment.bash
-#             ^^^^^^^^^^^^^^ meta.function-call.arguments.shell meta.assignment.l-value.shell variable.other.readwrite.shell
-#             ^ punctuation.definition.quoted.begin.shell
-#                  ^ - punctuation
-#                          ^ punctuation.definition.quoted.end.shell
-
+#             ^^^^^^^^^^^^^^ meta.assignment.r-value.shell meta.string.glob.shell string.quoted.single.shell
+#             ^ punctuation.definition.string.begin.shell
+#              ^^^^^^^^^^^^^ - variable
+#                          ^ punctuation.definition.string.end.shell
 
 HEALTHCHECK --start-period=10s --interval=5s --retries=10 --timeout=3s CMD /opt/mssql-tools/bin/sqlcmd -d some_database -U sa -P some_sa_pa55word -Q 'SELECT 1;'
 # ^^^^^^^^^ keyword.other.containerfile
@@ -475,6 +474,10 @@ ENTRYPOINT [\
 HEALTHCHECK NONE
 # ^^^^^^^^^^^^^^ keyword.other.containerfile
 ARG APP_PORT=8080
+#^^ keyword.context.containerfile
+#  ^^^^^^^^^ variable.parameter.containerfile
+#           ^ keyword.operator.assignment.bash
+#            ^^^^ meta.assignment.r-value.shell meta.string.glob.shell string.unquoted.shell - invalid
 EXPOSE $APP_PORT
 #^^^^^ keyword.other.containerfile
 #     ^^^^^^^^^^ meta.function-call.arguments.shell
