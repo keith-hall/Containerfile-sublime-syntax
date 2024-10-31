@@ -429,6 +429,12 @@ ENTRYPOINT [\
 
 HEALTHCHECK NONE
 # ^^^^^^^^^^^^^^ keyword.other.containerfile
+ARG APP_PORT=8080
+EXPOSE $APP_PORT
+#^^^^^ keyword.other.containerfile
+#     ^^^^^^^^^^ meta.function-call.arguments.shell
+#      ^^^^^^^^^ meta.string.glob.shell meta.interpolation.parameter.shell variable.other.readwrite.shell
+#      ^ punctuation.definition.variable.shell
 
 ENTRYPOINT [\
     "sh", "-c",\

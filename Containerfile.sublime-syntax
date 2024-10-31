@@ -244,6 +244,7 @@ contexts:
     - include: shell-instruction
     - match: (?i)HEALTHCHECK\s+NONE\b
       scope: keyword.other.containerfile
+      pop: 1
     - match: (?i)HEALTHCHECK\b
       scope: keyword.other.containerfile
       set:
