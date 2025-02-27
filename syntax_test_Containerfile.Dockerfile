@@ -62,7 +62,7 @@ RUN echo 'we are running some # of cool things'
 RUN echo hello \
 # comment
 world
-
+# ^^^ string.unquoted.shell
 # The following example is equivalent.
 RUN echo hello \
 world

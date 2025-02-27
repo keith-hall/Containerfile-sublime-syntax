@@ -331,13 +331,16 @@ contexts:
   embedded_shell:
     - meta_scope: source.shell.bash.embedded.containerfile
     - include: line-continuation
-    - match: ^\s+(#)
+    - include: eat-bare-comments
+    - match: $
+      pop: true
+    - include: scope:source.shell.bash.containerfile#statements
+
+  eat-bare-comments:
+    - match: ^\s*(#)
       captures:
         1: punctuation.definition.comment.containerfile
       push: comment-body-eat-line-ending
-    - match: $
-      pop: true
-    - include: scope:source.shell.bash#statements
 
   optional-cmd:
     - include: line-continuation

@@ -1,0 +1,14 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+scope: source.shell.bash.containerfile
+version: 2
+hidden: true
+
+extends: Packages/ShellScript/Bash.sublime-syntax
+
+contexts:
+  prototype:
+    - meta_prepend: true
+    - include: scope:source.containerfile#eat-bare-comments
+    - include: scope:source.containerfile#line-continuation
