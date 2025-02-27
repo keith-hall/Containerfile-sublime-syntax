@@ -20,7 +20,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - build: 4146
+          - build: 4192
+            packages: master
+          - build: 4194
             packages: master
     timeout-minutes: 15
     runs-on: ubuntu-latest
