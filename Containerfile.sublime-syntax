@@ -48,6 +48,12 @@ contexts:
   parser-directive-value:
     - meta_scope: comment.line.containerfile meta.annotation.parameters.containerfile
     - meta_content_scope: string.unquoted.containerfile
+    - match: (\w+)(=)
+      captures:
+        1: variable.parameter.containerfile
+        2: keyword.operator.assignment.containerfile
+    - match: ','
+      scope: punctuation.separator.sequence.containerfile
     - match: $\n?
       pop: true
 
@@ -234,7 +240,6 @@ contexts:
       captures:
         1: keyword.context.containerfile
       set:
-        - scope:source.shell.bash#cmd-args-meta
         - scope:source.shell.bash#cmd-export-args
     - match: (?i)(LABEL)\b
       captures:
@@ -244,6 +249,7 @@ contexts:
     - include: shell-instruction
     - match: (?i)HEALTHCHECK\s+NONE\b
       scope: keyword.other.containerfile
+      pop: 1
     - match: (?i)HEALTHCHECK\b
       scope: keyword.other.containerfile
       set:
@@ -325,13 +331,16 @@ contexts:
   embedded_shell:
     - meta_scope: source.shell.bash.embedded.containerfile
     - include: line-continuation
-    - match: ^\s+(#)
+    - include: eat-bare-comments
+    - match: $
+      pop: true
+    - include: scope:source.shell.bash.containerfile#statements
+
+  eat-bare-comments:
+    - match: ^\s*(#)
       captures:
         1: punctuation.definition.comment.containerfile
       push: comment-body-eat-line-ending
-    - match: $
-      pop: true
-    - include: scope:source.shell.bash#statements
 
   optional-cmd:
     - include: line-continuation
@@ -350,5 +359,5 @@ contexts:
     - match: =
       scope: keyword.operator.assignment.bash
       set:
-        - scope:source.shell.bash#cmd-args-meta
-        - scope:source.shell.bash#cmd-export-args
+        - scope:source.shell.bash#assignment-value-meta
+        - scope:source.shell.bash#literal-array-value
