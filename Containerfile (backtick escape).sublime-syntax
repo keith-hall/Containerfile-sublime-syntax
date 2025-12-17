@@ -12,8 +12,8 @@ variables:
 
 contexts:
   embedded_shell:
-    - meta_scope: source.powershell.embedded.containerfile
-    - include: line-continuation
-    - match: $
-      pop: true
-    - include: scope:source.powershell
+    - match: (?=\S)
+      embed: scope:source.powershell
+      escape: (?<!`)$\n
+    - match: ^(?!.*`$)
+      pop: 1
