@@ -18,6 +18,9 @@ variables:
 
 contexts:
   main:
+    - include: statements
+
+  statements:
     - include: parser-directives
     - include: comments
     - match: (?i)^\s*(?=ARG|FROM)\b
@@ -30,7 +33,7 @@ contexts:
       captures:
         1: comment.line.containerfile meta.annotation.containerfile punctuation.definition.annotation.containerfile
       set:
-        - scope:source.containerfile.backtick
+        - scope:source.containerfile.backtick#statements
         - parser-directive-body
     - match: '^\s*(#)(?=\s*\w+\s*=)'
       captures:
