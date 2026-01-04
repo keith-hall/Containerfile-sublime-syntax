@@ -1,366 +1,346 @@
 %YAML 1.2
 ---
+# https://docs.docker.com/reference/dockerfile
 # http://www.sublimetext.com/docs/syntax.html
 name: Containerfile
-file_extensions:
-  - Dockerfile
-  - Containerfile
-first_line_match: (?i)^from[ ][^:]+:[^:]+
 scope: source.containerfile
 version: 2
 
+extends: Packages/ShellScript/Bash.sublime-syntax
+
+file_extensions:
+  - Dockerfile
+  - Containerfile
+
+first_line_match: (?i)^from[ ][^:]+:[^:]+
+
 variables:
-  identifier: '[[:alnum:]]+'
-  onbuild_instruction: (?i:add|arg|env|copy|expose|healthcheck|label|run|shell|stopsignal|user|volume|workdir)
-  non_onbuild_instruction: (?i:maintainer)
-  shell_instruction: (?i:run|cmd|entrypoint|shell)
-  escape_character: \\
+  powershell_images: (?:microsoft|powershell|windows)
 
 contexts:
   main:
+    - include: docker-directives
+    - include: docker-instructions
     - include: statements
 
-  statements:
-    - include: parser-directives
-    - include: comments
-    - match: (?i)^\s*(?=ARG|FROM)\b
-      push: expect-arg-or-from-instructions
-
-###[ PARSER DIRECTIVES AND COMMENTS ]##############################################################
-
-  parser-directives:
-    - match: (?i)^\s*(#)(?=\s*escape\s*=\s*`$)
-      captures:
-        1: comment.line.containerfile meta.annotation.containerfile punctuation.definition.annotation.containerfile
-      set:
-        - scope:source.containerfile.backtick#statements
-        - parser-directive-body
-    - match: '^\s*(#)(?=\s*\w+\s*=)'
-      captures:
-        1: comment.line.containerfile meta.annotation.containerfile punctuation.definition.annotation.containerfile
-      push: parser-directive-body
-
-  parser-directive-body:
-    - meta_content_scope: comment.line.containerfile meta.annotation.identifier.containerfile
-    - match: \w+
-      scope: variable.language.containerfile
-    - match: =
-      scope: keyword.operator.assignment.containerfile
-      set: parser-directive-value
-
-  parser-directive-value:
-    - meta_scope: comment.line.containerfile meta.annotation.parameters.containerfile
-    - meta_content_scope: string.unquoted.containerfile
-    - match: (\w+)(=)
-      captures:
-        1: variable.parameter.containerfile
-        2: keyword.operator.assignment.containerfile
-    - match: ','
-      scope: punctuation.separator.sequence.containerfile
-    - match: $\n?
-      pop: true
-
-  comments:
-    - match: ^\s*(#)
-      captures:
-        1: punctuation.definition.comment.containerfile
-      push: comment-body
-
-  comment-body:
-    - meta_scope: comment.line.number-sign.containerfile
-    - match: $\n?
-      pop: true
-
-  comment-body-eat-line-ending:
-    - meta_scope: comment.line.number-sign.containerfile
-    - match: ^
-      pop: true
-
-  line-continuation:
-    - match: '{{escape_character}}$\n?'
-      push: inside-line-continuation
-
-  inside-line-continuation:
-    - meta_scope: punctuation.separator.continuation.line.containerfile
-    - match: ^
-      pop: true
-
-####[ FROM INSTRUCTION ]###########################################################################
-
-  from-expect-name:
-    - match: $\n?
-      scope: invalid.illegal.missing-identifier.containerfile
-      pop: 2
-    - match: \s*(?=:@)
-      scope: invalid.illegal.missing-identifier.containerfile
-      set: from-optional-tag
-    - match: ''
-      pop: true
-
-  from-name-inside:
-    - meta_content_scope: support.module.containerfile
-    - include: variable-reference
-    - match: (?=[\s:@])
-      set: from-optional-tag
-    - match: $\n?
-      pop: true
-
-  from-name:
-    # so the meta_scope doesn't apply to the context when it isn't top most on the stack
-    - match: ''
-      set: from-name-inside
-
-  variable-reference:
-    # - match: (\$)(\{)(\w+)(\})
-    #   captures:
-    #     0: meta.interpolation.parameter.containerfile
-    #     1: punctuation.definition.variable.containerfile
-    #     2: punctuation.section.interpolation.begin.containerfile
-    #     3: variable.parameter.containerfile
-    #     4: punctuation.section.interpolation.end.containerfile
-    - include: scope:source.shell.bash#variable-expansions
-
-  from-optional-tag:
-    - match: '[:@]'
-      scope: punctuation.separator.key-value.containerfile
-      set: [container-tag, expect-container-tag]
-    - match: (?=\S)|$
-      pop: true
-
-  from-optional-as:
-    - match: (?i)\b(as)\s+([-\w]+)
-      captures:
-        1: keyword.context.containerfile
-        2: entity.name.label.containerfile
-      pop: true
-    - match: $
-      pop: true
-
-  expect-container-tag:
-    - match: $\n?
-      scope: invalid.illegal.missing-tag-or-digest.containerfile
-      pop: 2
-    - match: ''
-      pop: true
-
-  container-tag:
-    # so the meta_scope doesn't apply to the context when it isn't top most on the stack
-    - match: ''
-      set: container-tag-inside
-
-  container-tag-inside:
-    - meta_content_scope: support.constant.containerfile
-    - include: variable-reference
-    - match: (?=\s)|$
-      pop: true
-
-  from-line-meta-scope:
-    - meta_scope: meta.namespace.containerfile
-    - match: $\n?
-      pop: true
-
-####[ INSTRUCTION ARGS ]###########################################################################
-
-  optional-instruction-args:
-    - match: (--)\w+(?:-[-\w]*)?
-      scope: variable.parameter.containerfile
-      captures:
-        1: punctuation.definition.parameter.containerfile
-      push: expect-optional-arg-assignment
-    - include: line-continuation
-    - match: (?=\S|$)
-      pop: true
-
-  expect-optional-arg-assignment:
-    - match: '='
-      scope: keyword.operator.assignment.containerfile
-      set: expect-optional-arg-value
-    - match: (?=\S|$)
-      pop: true
-
-  expect-optional-arg-value:
-    - match: (?=\w+=)
-      set: expect-instruction-arg-additional-key
-    - include: variable-reference
-    - match: '[^\s,]+'
-      scope: string.unquoted.containerfile
-      set: possible-instruction-arg-value-additional-arguments
-    - match: (?=\s|$)
-      pop: true
-
-  possible-instruction-arg-value-additional-arguments:
-    - match: ','
-      scope: punctuation.separator.sequence.containerfile
-      set: expect-instruction-arg-additional-key
-    - match: ''
-      pop: true
-
-  expect-instruction-arg-additional-key:
-    - match: \w+\b
-      scope: variable.parameter.inner.containerfile
-      set: expect-optional-arg-assignment
-
-###[ INSTRUCTIONS ]################################################################################
-
-  expect-arg-or-from-instructions:
-    - match: (?i)ARG\b
-      scope: keyword.context.containerfile
-      push: arg-expect-name
-    - match: (?i)FROM\b
-      scope: keyword.import.from.containerfile
-      set:
-        - expect-instructions
-        - from-line-meta-scope
-        - from-optional-as
-        - from-name
-        - from-expect-name
-        - optional-instruction-args
+  line-continuation-body:
+    - meta_prepend: true
     - include: comments
 
-  expect-instructions:
-    - include: comments
-    - include: expect-arg-or-from-instructions
-    - match: (?i)^\s*(onbuild)\s+(?={{onbuild_instruction}}\s)
-      captures:
-        1: storage.modifier.containerfile
-      push: instruction
-    - match: ^\s*(?=(?:{{onbuild_instruction}}|{{non_onbuild_instruction}})\b)
-      push: instruction
-    - match: ^\s*(?={{shell_instruction}}\b)
-      push: shell-instruction
+####[ DOCKER DIRECTIVES ]######################################################
 
-  instruction:
-    - match: (?i)(ENV)\s(\w+)([ ])
+  docker-directives:
+    - match: (\#)\s*(escape)(\s*(=)\s*(`))
       captures:
-        1: keyword.context.containerfile
-        2: variable.other.readwrite.shell
-        3: invalid.deprecated.missing-equals.containerfile
+        1: punctuation.definition.comment.shell
+        2: meta.annotation.identifier.containerfile variable.language.containerfile
+        3: meta.annotation.containerfile
+        4: keyword.operator.assignment.containerfile
       set:
-        - match: $
-          pop: true
-        - include: scope:source.shell.bash#literal-array-value
-    - match: (?i)(ENV)\b
+        - scope:source.containerfile.powershell
+        - docker-directive-body
+    - match: (\#)\s*(\w+)(\s*(=)\s*)
       captures:
-        1: keyword.context.containerfile
-      set:
-        - scope:source.shell.bash#cmd-export-args
-    - match: (?i)(LABEL)\b
-      captures:
-        1: keyword.other.containerfile
-      set:
-        - arg-expect-name
-    - include: shell-instruction
-    - match: (?i)HEALTHCHECK\s+NONE\b
-      scope: keyword.other.containerfile
-      pop: 1
-    - match: (?i)HEALTHCHECK\b
-      scope: keyword.other.containerfile
-      set:
-        - scope:source.shell.bash#cmd-args-meta
-        - scope:source.shell.bash#cmd-args
-        - optional-cmd
-        - optional-instruction-args
-    - match: '{{onbuild_instruction}}(?=\s)'
-      scope: keyword.other.containerfile
-      set:
-        - scope:source.shell.bash#cmd-args-meta
-        - scope:source.shell.bash#cmd-args # TODO: set optional-instruction-args first?
-    - match: '{{non_onbuild_instruction}}(?=\s)'
-      scope: keyword.other.containerfile
-      set:
-        - scope:source.shell.bash#cmd-args-meta
-        - scope:source.shell.bash#cmd-args
+        1: punctuation.definition.comment.shell
+        2: meta.annotation.identifier.containerfile variable.language.containerfile
+        3: meta.annotation.containerfile
+        4: keyword.operator.assignment.containerfile
+      push: docker-directive-body
 
-  shell-instruction:
-    - match: '{{shell_instruction}}\b'
-      scope: keyword.other.containerfile
-      set:
-        - shell-instruction-args
-        - optional-instruction-args
-
-####[ SHELL INSTRUCTION ]##########################################################################
-
-  shell-instruction-args:
-    - match: \s*(\[)
-      captures:
-        1: punctuation.section.sequence.begin.containerfile
-      set: inside-shell-json-array-of-strings
-    - match: '[ \t]*(?!{{escape_character}}$)(?=\S)'
-      set: embedded_shell
-    - match: $\n?
-      scope: invalid.illegal.missing-shell-instruction.containerfile
+  docker-directive-body:
+    - meta_scope: comment.line.number-sign.shell
+    - meta_content_scope: meta.annotation.value.containerfile string.unquoted.shell
+    - match: \n
       pop: 1
 
-  inside-shell-json-array-of-strings:
-    - meta_scope: meta.sequence.containerfile
-    - match: \]
-      scope: invalid.illegal.expected-string.json
-    - match: \"
-      scope: punctuation.definition.string.begin.json
+####[ DOCKER INSTRUCTIONS ]####################################################
+
+  docker-instructions:
+    # ARG
+    - match: (?i:ARG){{cmd_break}}
+      scope: keyword.declaration.arg.containerfile
+      push: cmd-arg-args
+    # COPY
+    - match: (?i:COPY){{cmd_break}}
+      scope: keyword.other.containerfile
+      push: cmd-copy-args
+    # ENV
+    - match: (?i:ENV){{cmd_break}}
+      scope: keyword.declaration.env.containerfile
+      push: cmd-env-args
+    # FROM
+    - match: (?i:FROM)(?=\s+\S*{{powershell_images}})
+      scope: keyword.control.import.from.containerfile
+      set:
+        - scope:source.containerfile.powershell
+        - cmd-from-args
+    - match: (?i:FROM){{cmd_break}}
+      scope: keyword.control.import.from.containerfile
+      push: cmd-from-args
+    # LABEL
+    - match: (?i:LABEL){{cmd_break}}
+      scope: keyword.declaration.label.containerfile
+      push: cmd-label-args
+    # ONBUILD
+    - match: (?i:ONBUILD){{cmd_break}}
+      scope: keyword.other.containerfile
+    # RUN
+    - match: (?i:CMD|ENTRYPOINT|HEALTHCHECK|RUN|SHELL){{cmd_break}}
+      scope: keyword.control.flow.containerfile
+      push: cmd-run-args
+    # other
+    - match: (?i:ADD|EXPOSE|STOPSIGNAL|USER|VOLUME|WORKDIR){{cmd_break}}
+      scope: keyword.other.containerfile
+      push: cmd-args
+
+####[ ARG INSTRUCTIONS ]#######################################################
+
+  cmd-arg-args:
+    - meta_include_prototype: false
+    - include: cmd-args-end
+    - match: '{{variable_begin}}'
       push:
-        - shell-json-expect-comma-or-end-of-array
-        - inside-json-string
-    - include: shell-json-common
+        - literal-array-value-assignment
+        - arg-name-chars
+    - include: illegal-words
 
-  shell-json-common:
-    - include: line-continuation
-    - include: comments
-    - match: $\n
-      scope: invalid.illegal.line-end.containerfile
-      pop: true
-
-  inside-json-string:
-    - meta_scope: string.quoted.double.json
-    - match: \"
-      scope: punctuation.definition.string.end.json
-      pop: 1
-    - include: scope:source.json#string-escapes
-    - match: $\n
-      scope: invalid.illegal.unclosed-string.json
-      pop: 1
-
-  shell-json-expect-comma-or-end-of-array:
-    - include: shell-json-common
-    - match: \]
-      scope: punctuation.section.sequence.end.json
-      pop: 2
-    - match: ','
-      scope: punctuation.separator.sequence.json
-      pop: true
-    - match: '[^\s\]]'
-      scope: invalid.illegal.expected-sequence-separator.json
-      pop: true
-
-  embedded_shell:
-    - meta_scope: source.shell.bash.embedded.containerfile
-    - include: line-continuation
-    - include: eat-bare-comments
-    - match: $
-      pop: true
-    - include: scope:source.shell.bash.containerfile#statements
-
-  eat-bare-comments:
-    - match: ^\s*(#)
-      captures:
-        1: punctuation.definition.comment.containerfile
-      push: comment-body-eat-line-ending
-
-  optional-cmd:
-    - include: line-continuation
-    - match: (?i)CMD\b
-      scope: keyword.other.containerfile
-      set: shell-instruction-args
-    - match: ''
-      pop: true
-
-####[ ARG INSTRUCTION ]############################################################################
-
-  arg-expect-name:
+  arg-name-chars:
     - meta_content_scope: variable.parameter.containerfile
+    - match: (?=[=\s])
+      pop: 1
+    - include: literal-unquoted-content
+
+####[ COPY INSTRUCTIONS ]######################################################
+
+  cmd-copy-args:
+    - meta_include_prototype: false
+    - meta_content_scope: meta.function-call.arguments.shell
+    # content as heredoc
+    - match: (<<-)\s*(?=["'\\]?({{heredoc}}))
+      captures:
+        1: keyword.operator.assignment.redirection.containerfile
+      embed: cmd-copy-heredoc-begin
+      escape: '{{tab_indent}}(\2)$\n?'
+      escape_captures:
+        0: meta.redirection.containerfile meta.tag.heredoc.end.containerfile
+        1: entity.name.tag.heredoc.containerfile
+      pop: 1
+    - match: (<<)\s*(?=["'\\]?({{heredoc}}))
+      captures:
+        1: keyword.operator.assignment.redirection.containerfile
+      embed: cmd-copy-heredoc-begin
+      escape: '{{no_indent}}(\2)$\n?'
+      escape_captures:
+        0: meta.redirection.containerfile meta.tag.heredoc.end.containerfile
+        1: entity.name.tag.heredoc.containerfile
+      pop: 1
+    - include: cmd-args
+
+  cmd-copy-heredoc-begin:
+    # Same as Bash HEREDOC, but with variable expansion in all variants
+    - meta_include_prototype: false
+    - meta_scope: meta.redirection.containerfile
+    - match: (')({{heredoc}})(')
+      scope: meta.tag.heredoc.begin.containerfile
+      captures:
+        1: punctuation.definition.tag.begin.containerfile
+        2: entity.name.tag.heredoc.containerfile
+        3: punctuation.definition.tag.end.containerfile
+      push:
+        - heredoc-preamble
+        - cmd-args
+    - match: (")({{heredoc}})(")
+      scope: meta.tag.heredoc.begin.containerfile
+      captures:
+        1: punctuation.definition.tag.begin.containerfile
+        2: entity.name.tag.heredoc.containerfile
+        3: punctuation.definition.tag.end.containerfile
+      push:
+        - heredoc-preamble
+        - cmd-args
+    - match: (\\)({{heredoc}})
+      scope: meta.tag.heredoc.begin.containerfile
+      captures:
+        1: punctuation.definition.tag.containerfile
+        2: entity.name.tag.heredoc.containerfile
+      push:
+        - heredoc-preamble
+        - cmd-args
+    - match: '{{heredoc}}'
+      scope: meta.tag.heredoc.begin.containerfile entity.name.tag.heredoc.containerfile
+      push:
+        - heredoc-preamble
+        - cmd-args
+
+####[ ENV INSTRUCTIONS ]#######################################################
+
+  cmd-env-args:
+    - match: (\w+)\b\s*(?!=)
+      captures:
+        1: meta.assignment.l-value.shell variable.other.readwrite.shell
+      set: literal-array-value
+    - include: cmd-export-args
+
+####[ FROM INSTRUCTIONS ]######################################################
+
+  cmd-from-args:
+    - meta_include_prototype: false
+    - meta_scope: meta.import.containerfile
+    - include: cmd-args-options
+    - match: (?=\S)
+      push:
+        - from-container-alias
+        - from-container-name-chars
     - match: $
-      pop: true
-    - match: =
-      scope: keyword.operator.assignment.bash
+      pop: 1
+
+  from-container-name-chars:
+    - meta_content_scope: meta.namespace.containerfile support.module.containerfile
+    - match: '@'
+      scope: meta.namespace.containerfile punctuation.separator.key-value.containerfile
+      set: from-container-hash-chars
+    - match: ':'
+      scope: meta.namespace.containerfile punctuation.separator.key-value.containerfile
+      set: from-container-tag-chars
+    - match: (?=\s)
+      pop: 1
+    - include: literal-unquoted-content
+
+  from-container-tag-chars:
+    - meta_content_scope: meta.namespace.containerfile constant.language.ref.tag.containerfile
+    - match: (?=\s)
+      pop: 1
+    - include: literal-unquoted-content
+
+  from-container-hash-chars:
+    - meta_content_scope: meta.namespace.containerfile constant.language.ref.digest.containerfile
+    - match: (?=\s)
+      pop: 1
+    - include: literal-unquoted-content
+
+  from-container-alias:
+    - match: ((?i:as))\s+([-\w]+)
+      captures:
+        1: keyword.operator.assignment.as.containerfile
+        2: entity.name.label.containerfile
+      pop: 2
+    - match: $
+      pop: 2
+
+####[ LABEL INSTRUCTION ]######################################################
+
+  cmd-label-args:
+    - meta_include_prototype: false
+    - include: cmd-args-end
+    - match: '{{variable_begin}}'
+      push:
+        - literal-array-value-assignment
+        - label-name-chars
+    - include: illegal-words
+
+  label-name-chars:
+    - meta_content_scope: variable.label.containerfile
+    - match: (?=[=\s])
+      pop: 1
+    - include: literal-unquoted-content
+
+####[ RUN INSTRUCTIONS ]#######################################################
+
+  cmd-run-args:
+    - meta_include_prototype: false
+    - meta_content_scope: meta.function-call.arguments.shell
+    # command line as list of strings
+    - match: \[
+      scope: punctuation.section.sequence.begin.containerfile
       set:
-        - scope:source.shell.bash#assignment-value-meta
-        - scope:source.shell.bash#literal-array-value
+        - cmd-run-argument-list-body
+        - cmd-run-command-name
+    # script as heredoc
+    - match: (<<-)\s*(?=["'\\]?({{heredoc}}))
+      captures:
+        1: keyword.operator.assignment.redirection.containerfile
+      embed: cmd-run-heredoc-begin
+      escape: '{{tab_indent}}(\2)$\n?'
+      escape_captures:
+        0: meta.redirection.containerfile meta.tag.heredoc.end.containerfile
+        1: entity.name.tag.heredoc.containerfile
+      pop: 1
+    - match: (<<)\s*(?=["'\\]?({{heredoc}}))
+      captures:
+        1: keyword.operator.assignment.redirection.containerfile
+      embed: cmd-run-heredoc-begin
+      escape: '{{no_indent}}(\2)$\n?'
+      escape_captures:
+        0: meta.redirection.containerfile meta.tag.heredoc.end.containerfile
+        1: entity.name.tag.heredoc.containerfile
+      pop: 1
+    # command line in shell form
+    - include: cmd-exec-args
+
+  cmd-run-command-name:
+    - match: \"
+      scope: punctuation.definition.quoted.begin.shell
+      set:
+        - cmd-run-command-name-body
+        - path-pattern-quoted-begin
+    - include: comments
+    - include: else-pop
+
+  cmd-run-command-name-body:
+    - meta_scope: meta.function-call.identifier.shell meta.command.shell variable.function.shell
+    - include: path-pattern-double-quoted-body
+
+  cmd-run-argument-list-body:
+    - meta_include_prototype: false
+    - meta_scope: meta.function-call.arguments.shell meta.sequence.list.containerfile
+    - match: \]
+      scope: punctuation.section.sequence.end.containerfile
+      pop: 1
+    - match: \"
+      scope: punctuation.definition.string.begin.shell
+      push: cmd-run-arg-body
+    - include: comma-separators
+    - include: comments
+
+  cmd-run-arg-body:
+    - meta_scope: meta.string.glob.shell string.quoted.double.shell
+    - include: string-path-pattern-double-quoted-body
+
+  cmd-run-heredoc-begin:
+    # Same as Bash HEREDOC, but with Bash highlighting in all variants
+    - meta_include_prototype: false
+    - meta_scope: meta.redirection.containerfile
+    - match: (')({{heredoc}})(')
+      scope: meta.tag.heredoc.begin.containerfile
+      captures:
+        1: punctuation.definition.tag.begin.containerfile
+        2: entity.name.tag.heredoc.containerfile
+        3: punctuation.definition.tag.end.containerfile
+      push:
+        - cmd-run-heredoc-body
+        - cmd-args
+    - match: (")({{heredoc}})(")
+      scope: meta.tag.heredoc.begin.containerfile
+      captures:
+        1: punctuation.definition.tag.begin.containerfile
+        2: entity.name.tag.heredoc.containerfile
+        3: punctuation.definition.tag.end.containerfile
+      push:
+        - cmd-run-heredoc-body
+        - cmd-args
+    - match: (\\)({{heredoc}})
+      scope: meta.tag.heredoc.begin.containerfile
+      captures:
+        1: punctuation.definition.tag.containerfile
+        2: entity.name.tag.heredoc.containerfile
+      push:
+        - cmd-run-heredoc-body
+        - cmd-args
+    - match: '{{heredoc}}'
+      scope: meta.tag.heredoc.begin.containerfile entity.name.tag.heredoc.containerfile
+      push:
+        - cmd-run-heredoc-body
+        - cmd-args
+
+  cmd-run-heredoc-body:
+    - include: statements
