@@ -1,0 +1,60 @@
+%YAML 1.2
+---
+# https://docs.docker.com/reference/dockerfile
+# http://www.sublimetext.com/docs/syntax.html
+name: Containerfile (PowerShell)
+scope: source.containerfile.powershell
+version: 2
+
+extends: Containerfile.sublime-syntax
+
+contexts:
+
+  cmd-run-args:
+    - meta_include_prototype: false
+    - meta_content_scope: meta.function-call.arguments.shell
+    # command line as list of strings
+    - match: \[(?=\s*")
+      scope: punctuation.section.sequence.begin.containerfile
+      set:
+        - cmd-run-argument-list-body
+        - cmd-run-command-name
+    # script as heredoc
+    - match: (<<-)\s*(?=["'\\]?({{heredoc}}))
+      captures:
+        1: keyword.operator.assignment.redirection.containerfile
+      embed: cmd-run-heredoc-begin
+      escape: '{{tab_indent}}(\2)$\n?'
+      escape_captures:
+        0: meta.redirection.containerfile meta.tag.heredoc.end.containerfile
+        1: entity.name.tag.heredoc.containerfile
+      pop: 1
+    - match: (<<)\s*(?=["'\\]?({{heredoc}}))
+      captures:
+        1: keyword.operator.assignment.redirection.containerfile
+      embed: cmd-run-heredoc-begin
+      escape: '{{no_indent}}(\2)$\n?'
+      escape_captures:
+        0: meta.redirection.containerfile meta.tag.heredoc.end.containerfile
+        1: entity.name.tag.heredoc.containerfile
+      pop: 1
+    - match: ([-+])[cl]*[a]{{opt_break}}
+      scope:
+        meta.parameter.option.shell
+        variable.parameter.option.shell
+      captures:
+        1: punctuation.definition.parameter.shell
+      push: cmd-args-option-maybe-value
+    - include: cmd-args-options
+    # command line in shell form
+    - match: (?=\S)
+      embed: scope:source.powershell
+      escape: (?<![`\\])$\n
+      pop: 1
+    - include: eol-pop
+
+  cmd-run-heredoc-body:
+    - meta_prepend: true
+    - match: ^
+      embed: scope:source.powershell
+      escape: (?!)
